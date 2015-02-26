@@ -9,8 +9,8 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ImageButton;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -61,6 +61,11 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
+        // Set full screen view
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+
         setContentView(R.layout.activity_camera);
 
         mOpenCvCameraView = (CameraView) findViewById(R.id.java_surface_view);
@@ -68,9 +73,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
 
         mOpenCvCameraView.setCvCameraViewListener(this);
-
-        ImageButton ib = (ImageButton) findViewById(R.id.processButton);
-        ib.setVisibility(View.VISIBLE);
 
         ArrayList<View> views = new ArrayList<View>();
         //views.add(findViewById(R.id.processButton));
