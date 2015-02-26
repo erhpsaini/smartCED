@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
@@ -68,8 +69,11 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         mOpenCvCameraView.setCvCameraViewListener(this);
 
+        ImageButton ib = (ImageButton) findViewById(R.id.processButton);
+        ib.setVisibility(View.VISIBLE);
+
         ArrayList<View> views = new ArrayList<View>();
-        views.add(findViewById(R.id.processButton));
+        //views.add(findViewById(R.id.processButton));
         views.add(findViewById(R.id.settingsButton));
         mOpenCvCameraView.addTouchables(views);
     }

@@ -3,7 +3,8 @@
     xmlns:opencv="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:id="@+id/activity_camera">
 
     <com.hsbsoftwares.android.app.healthdiagnostic.CameraView
         android:layout_width="match_parent"
@@ -19,8 +20,7 @@
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/start_processing"
         android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@id/java_surface_view"
         android:id="@+id/processButton" />
 
     <ImageButton

@@ -1,4 +1,4 @@
-package com.hsbsoftwares.android.app.healthdiagnostic;
+package com.hsbsoftwares.android.app.healthdiagnostic.com.hsbsoftwares.android.app.healthdiagnostic.motiondetection;
 
 import android.util.Log;
 
@@ -39,7 +39,7 @@ public class MotionDetection {
         Imgproc.threshold(resultFrame, resultFrame, 60, 255, Imgproc.THRESH_BINARY);
         //saving the current frame as previous.
         currentGrayFrame.copyTo(previousFrame);
-        //Realising Mat to avoid memory leaks
+        //releasing Mat to avoid memory leaks
         currentGrayFrame.release();
 
         return resultFrame;
@@ -92,9 +92,10 @@ public class MotionDetection {
         //saving the current frame as previous.
         currentGrayFrame.copyTo(previousFrame);
 
-        //Realising memory
+        //Releasing memory
         currentGrayFrame.release();
         differenceFrame.release();
+
         return resultFrame;
     }
 }
