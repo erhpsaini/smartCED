@@ -1,4 +1,4 @@
-package com.hsbsoftwares.android.app.healthdiagnostic.com.hsbsoftwares.android.app.healthdiagnostic.motiondetection;
+package com.hsbsoftwares.android.app.healthdiagnostic.motiondetection;
 
 import android.util.Log;
 

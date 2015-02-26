@@ -18,7 +18,6 @@ import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -74,10 +73,12 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        ArrayList<View> views = new ArrayList<View>();
+        Camera camera = mOpenCvCameraView.getCamera();
+
+        //ArrayList<View> views = new ArrayList<View>();
         //views.add(findViewById(R.id.processButton));
-        views.add(findViewById(R.id.settingsButton));
-        mOpenCvCameraView.addTouchables(views);
+        //views.add(findViewById(R.id.settingsButton));
+        //mOpenCvCameraView.addTouchables(views);
     }
 
     @Override
@@ -102,12 +103,14 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     }
 
     public void onCameraViewStarted(int width, int height) {
+
     }
 
     public void onCameraViewStopped() {
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        Log.d(TAG, String.valueOf(inputFrame.rgba().cols() + "--" + inputFrame.rgba().rows()));
         return inputFrame.rgba();
     }
 
@@ -125,7 +128,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     public boolean onTouch(View v, MotionEvent event) {
         Log.i(TAG,"onTouch event");
 
-        mOpenCvCameraView.setResolution(mOpenCvCameraView.getResolutionList().get(3));//to be continued!!!!!!!!!!!!
+        mOpenCvCameraView.setBaseResolution();//to be continued!!!!!!!!!!!!
         return false;
     }
 }

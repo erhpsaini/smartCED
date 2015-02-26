@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:id="@+id/activity_camera">
+    android:id="@+id/activity_camera"
+    android:touchscreenBlocksFocus="false">
 
     <com.hsbsoftwares.android.app.healthdiagnostic.CameraView
         android:layout_width="match_parent"
@@ -13,15 +14,6 @@
         opencv:show_fps="true"
         android:id="@+id/java_surface_view" />
 
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
-        style="?android:attr/borderlessButtonStyle"
-        android:contentDescription="@string/start_processing"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/java_surface_view"
-        android:id="@+id/processButton" />
 
     <ImageButton
         android:layout_width="wrap_content"
@@ -32,5 +24,16 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher"
+        style="?android:attr/borderlessButtonStyle"
+        android:contentDescription="@string/start_processing"
+        android:id="@+id/processButton"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
 
 </RelativeLayout>
