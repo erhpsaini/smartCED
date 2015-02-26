@@ -37,7 +37,9 @@ public class CameraView extends JavaCameraView {
     public Camera.Size getResolution() {
         return mCamera.getParameters().getPreviewSize();
     }
-
+    /*
+     *Method to set the base resolution to work with to have good performances.
+     */
     public void setBaseResolution() {
         Camera.Parameters params = mCamera.getParameters();
 
