@@ -64,8 +64,4 @@ public class CameraView extends JavaCameraView {
         //params.setPictureSize(mSize.width, mSize.height);
         //mCamera.setParameters(params);
     }
-
-    public Camera getCamera(){
-        return mCamera;
-    }
 }

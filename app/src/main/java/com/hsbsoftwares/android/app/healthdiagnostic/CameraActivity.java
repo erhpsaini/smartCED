@@ -1,24 +1,26 @@
 package com.hsbsoftwares.android.app.healthdiagnostic;
 
 import android.app.Activity;
-import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
+
+import com.hsbsoftwares.android.app.healthdiagnostic.motiondetection.MotionDetection;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
+import org.opencv.core.Core;
+import org.opencv.core.CvType;
 import org.opencv.core.Mat;
-
-import java.util.List;
+import org.opencv.core.Rect;
+import org.opencv.core.Scalar;
 
 /**
  * Created by Harpreet Singh Bola on 24/02/2015.
@@ -26,8 +28,21 @@ import java.util.List;
 public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, View.OnTouchListener {
     private static final String TAG = "CameraActivity";
 
+    private static boolean mProcessingModeOn = false;
+
+    private static int touchNumbers;
+    private static final int BASE_FRAME_WIDTH = 640;
+    private static final int BASE_FRAME_HEIGHT = 480;
+    private static final int BASE_FRAME_TYPE = CvType.CV_8U;
+
     private CameraView mOpenCvCameraView;
-    private List<Camera.Size> mResolutionList;
+
+    private Mat mResultFrame;
+    private Mat mask;
+
+    private MotionDetection mMotionDetection;
+
+    Rect sel = new Rect();
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -58,6 +73,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         super.onCreate(savedInstanceState);
 
+        ImageButton processButton;
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Set full screen view
@@ -68,12 +85,17 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         setContentView(R.layout.activity_camera);
 
         mOpenCvCameraView = (CameraView) findViewById(R.id.java_surface_view);
-
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-
+        //The base frame for us is 640x480 for processing performances reasons.
+        mOpenCvCameraView.setMaxFrameSize(BASE_FRAME_WIDTH, BASE_FRAME_HEIGHT);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        Camera camera = mOpenCvCameraView.getCamera();
+        processButton = (ImageButton) findViewById(R.id.processButton);
+        processButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mProcessingModeOn = !mProcessingModeOn;
+            }
+        });
 
         //ArrayList<View> views = new ArrayList<View>();
         //views.add(findViewById(R.id.processButton));
@@ -103,32 +125,71 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     }
 
     public void onCameraViewStarted(int width, int height) {
-
+        mMotionDetection = new MotionDetection(width, height, BASE_FRAME_TYPE);
     }
 
     public void onCameraViewStopped() {
+        //Avoiding memory leaks.
+        mMotionDetection.releaseMemory();
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Log.d(TAG, String.valueOf(inputFrame.rgba().cols() + "--" + inputFrame.rgba().rows()));
-        return inputFrame.rgba();
-    }
+        Log.i(TAG, "Resolution using cols() & rows()" + String.valueOf(inputFrame.rgba().cols() + "x" + inputFrame.rgba().rows()));
+        Log.i(TAG, "Resolution using width() & height()" + String.valueOf(inputFrame.rgba().width() + "x" + inputFrame.rgba().height()));
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        return true;
-    }
+        Mat currentGrayFrame = inputFrame.gray();
 
-    public boolean onOptionsItemSelected(MenuItem item) {
-
-        return true;
+        if(mProcessingModeOn){
+            mResultFrame = mMotionDetection.detectMotion(currentGrayFrame);
+        }else{
+            mResultFrame = inputFrame.rgba();
+            if (mask != null) {
+                Core.bitwise_and(mResultFrame, mask, mResultFrame);
+            }
+        }
+        //releasing Mat to avoid memory leaks
+        currentGrayFrame.release();
+        return mResultFrame;
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        Log.i(TAG,"onTouch event");
+        Log.i(TAG, "onTouch event");
 
-        mOpenCvCameraView.setBaseResolution();//to be continued!!!!!!!!!!!!
+        //2 touch point mask
+        touchNumbers++;
+
+        if(touchNumbers != 3){
+            int cols = mResultFrame.cols();
+            int rows = mResultFrame.rows();
+
+            int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
+            int yOffset = (mOpenCvCameraView.getHeight() - rows) / 2;
+
+            int x = (int)event.getX() - xOffset;
+            int y = (int)event.getY() - yOffset;
+            if (x<0||y<0||x>=cols||y>=rows) return false;
+            if ((sel.x==0 && sel.y==0) || (sel.width!=0 && sel.height!=0))
+            {
+                mask = null;
+                sel.x=x; sel.y=y;
+                sel.width = sel.height = 0;
+            } else {
+                sel.width = x - sel.x;
+                sel.height = y - sel.y;
+                if ( sel.width <= 0 || sel.height <= 0 ) { // invalid, clear it all
+                    sel.x=sel.y=sel.width=sel.height = 0;
+                    mask = null;
+                    return false;
+                }
+                mask = Mat.zeros(mResultFrame.size(), mResultFrame.type());
+                mask.submat(sel).setTo(Scalar.all(255));
+            }
+            Log.w("touch",sel.toString());
+        }else{
+            touchNumbers = 0;
+            mask = null;
+        }
         return false;
     }
 }
