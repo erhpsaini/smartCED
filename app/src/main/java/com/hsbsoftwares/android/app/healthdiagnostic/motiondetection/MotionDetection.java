@@ -13,6 +13,9 @@ public class MotionDetection {
 
     private static final String TAG = "MotionDetection";
 
+    //This class must be singleton because it is used by openCV JavaCameraVIew's callbacks
+    private static MotionDetection instance = null;
+
     private static boolean  mFirstTime = true;
     private static boolean  mSecondTime = true;
 
@@ -20,12 +23,22 @@ public class MotionDetection {
     private static Mat  mLastThirdFrame;
     private static Mat  mResultFrame;
 
-    public MotionDetection(int frameWidth, int frameHeight, int frameType){
+    private MotionDetection(int frameWidth, int frameHeight, int frameType){
         mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
         mLastThirdFrame = new Mat(frameWidth, frameHeight, frameType);
         mResultFrame = new Mat(frameWidth, frameHeight, frameType);
     }
 
+    public static MotionDetection getInstance(int frameWidth, int frameHeight, int frameType){
+        if(instance == null){
+            instance = new MotionDetection(frameWidth, frameHeight, frameType);
+        }else{
+            mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
+            mLastThirdFrame = new Mat(frameWidth, frameHeight, frameType);
+            mResultFrame = new Mat(frameWidth, frameHeight, frameType);
+        }
+        return instance;
+    }
 
     public static void setmFirstTime(boolean mFirstTime) {
         MotionDetection.mFirstTime = mFirstTime;

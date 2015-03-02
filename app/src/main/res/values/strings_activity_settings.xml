@@ -1,0 +1,21 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">Video Processing</string>
+
+    <string name="pref_title_motion_detection_algorithm">Motion detection methods</string>
+    <string name="pref_description_motion_detection_algorithm">Select the method which better suits your need
+    </string>
+
+    <string-array name="pref_motion_detection_algorithm_list_tiles">
+        <item>Single diff</item>
+        <item>Double diff</item>
+    </string-array>
+    <string-array name="pref_motion_detection_algorithm_list_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+</resources>

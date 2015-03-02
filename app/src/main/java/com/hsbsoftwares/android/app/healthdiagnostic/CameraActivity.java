@@ -1,6 +1,7 @@
 package com.hsbsoftwares.android.app.healthdiagnostic;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -125,10 +126,12 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     }
 
     public void onCameraViewStarted(int width, int height) {
-        mMotionDetection = new MotionDetection(width, height, BASE_FRAME_TYPE);
+        mMotionDetection = mMotionDetection.getInstance(width, height, BASE_FRAME_TYPE);
+        mMotionDetection.setmFirstTime(true);
     }
 
     public void onCameraViewStopped() {
+        Log.i(TAG, "Called onCameraViewStopped");
         //Avoiding memory leaks.
         mMotionDetection.releaseMemory();
     }
@@ -191,5 +194,10 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             mask = null;
         }
         return false;
+    }
+
+    /** Called when the user clicks the Settings button */
+    public void openSettingsActivity(View view) {
+        startActivity(new Intent(this, SettingsActivity.class));
     }
 }
