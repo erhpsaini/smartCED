@@ -1,8 +1,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="@string/pref_header_general"
-        android:key="pref_key_video_processing_settings">
+        android:key="pref_key_video_processing_settings"
+        android:title="@string/pref_header_general">
 
     <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
          dismiss it. -->
@@ -15,6 +15,13 @@
         android:entryValues="@array/pref_motion_detection_algorithm_list_values"
         android:negativeButtonText="@null"
         android:positiveButtonText="@null" />
+
+    <com.hsbsoftwares.android.app.healthdiagnostic.NumberPickerPreference
+        android:key="motion_detection_threshold_picker"
+        android:title="@string/pref_title_motion_detection_threshold"
+        android:defaultValue="60"
+        android:dialogLayout="@layout/pref_number_picker_dialog"
+        android:dialogMessage="@string/pref_description_motion_detection_threshold" />
 
     </PreferenceCategory>
 

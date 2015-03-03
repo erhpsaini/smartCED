@@ -13,7 +13,7 @@ public class MotionDetection {
 
     private static final String TAG = "MotionDetection";
 
-    //This class must be singleton because it is used by openCV JavaCameraVIew's callbacks
+    //This class must be singleton because it is used by openCV JavaCameraView's callbacks
     private static MotionDetection instance = null;
 
     private static boolean  mFirstTime = true;
