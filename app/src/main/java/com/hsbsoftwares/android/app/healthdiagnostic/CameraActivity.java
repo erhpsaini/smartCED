@@ -86,9 +86,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         setContentView(R.layout.activity_camera);
 
         mOpenCvCameraView = (CameraView) findViewById(R.id.java_surface_view);
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         //The base frame for us is 640x480 for processing performances reasons.
         mOpenCvCameraView.setMaxFrameSize(BASE_FRAME_WIDTH, BASE_FRAME_HEIGHT);
+        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
         processButton = (ImageButton) findViewById(R.id.processButton);
