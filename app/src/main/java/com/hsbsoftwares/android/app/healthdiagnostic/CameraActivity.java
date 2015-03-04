@@ -1,6 +1,7 @@
 package com.hsbsoftwares.android.app.healthdiagnostic;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -24,13 +25,14 @@ import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Created by Harpreet Singh Bola on 24/02/2015.
  */
 public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, View.OnTouchListener {
     private static final String TAG = "CameraActivity";
+
+    private static Context mContext;
 
     private static boolean mProcessingModeOn = false;
 
@@ -60,7 +62,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                     Log.i(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
                     mOpenCvCameraView.setOnTouchListener(CameraActivity.this);
-
+                    /*
                     //Getting supported Fps range
                     supportedPreviewFpsRange = mOpenCvCameraView.getSupportedPreviewFpsRange();
                     Log.i(TAG, "FpsRange size: " + supportedPreviewFpsRange.size());
@@ -70,7 +72,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                     }
                     //Setting the maximum range supported which is in the last position of the list
                     mOpenCvCameraView.setSupportedPreviewFpsRange(supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[0],
-                            supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[1]);
+                            supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[1]);*/
                 } break;
                 default:
                 {
@@ -90,6 +92,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         Log.i(TAG, "called onCreate");
 
         super.onCreate(savedInstanceState);
+
+        mContext = getApplicationContext();
 
         ImageButton processButton;
 
@@ -143,7 +147,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     }
 
     public void onCameraViewStarted(int width, int height) {
-        mMotionDetection = mMotionDetection.getInstance(width, height, BASE_FRAME_TYPE);
+        mMotionDetection = mMotionDetection.getInstance(width, height, BASE_FRAME_TYPE, mContext);
         mMotionDetection.setmFirstTime(true);
     }
 
@@ -216,5 +220,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     /** Called when the user clicks the Settings button */
     public void openSettingsActivity(View view) {
         startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    public static Context getAppContext(){
+        return mContext;
     }
 }

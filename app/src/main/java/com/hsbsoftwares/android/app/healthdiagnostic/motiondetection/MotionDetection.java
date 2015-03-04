@@ -1,5 +1,8 @@
 package com.hsbsoftwares.android.app.healthdiagnostic.motiondetection;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.opencv.core.Core;
@@ -13,6 +16,8 @@ public class MotionDetection {
 
     private static final String TAG = "MotionDetection";
 
+    private final Context mContext;
+
     //This class must be singleton because it is used by openCV JavaCameraView's callbacks
     private static MotionDetection instance = null;
 
@@ -23,15 +28,18 @@ public class MotionDetection {
     private static Mat  mLastThirdFrame;
     private static Mat  mResultFrame;
 
-    private MotionDetection(int frameWidth, int frameHeight, int frameType){
+    private static int mThreshold;
+
+    private MotionDetection(int frameWidth, int frameHeight, int frameType, Context context){
         mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
         mLastThirdFrame = new Mat(frameWidth, frameHeight, frameType);
         mResultFrame = new Mat(frameWidth, frameHeight, frameType);
+        this.mContext = context;
     }
 
-    public static MotionDetection getInstance(int frameWidth, int frameHeight, int frameType){
+    public static MotionDetection getInstance(int frameWidth, int frameHeight, int frameType, Context context){
         if(instance == null){
-            instance = new MotionDetection(frameWidth, frameHeight, frameType);
+            instance = new MotionDetection(frameWidth, frameHeight, frameType, context);
         }else{
             mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
             mLastThirdFrame = new Mat(frameWidth, frameHeight, frameType);
@@ -52,7 +60,9 @@ public class MotionDetection {
      * Algorithm to detect motion using absdiff().
      */
     public Mat detectMotion(final Mat currentGrayFrame){
-
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String detectionMethod = prefs.getString("motion_detection_algorithm_list", "0");
+        Log.i(TAG, "Selected movement detection method is " + detectionMethod);
         if(mFirstTime){
     		/*
     		 * The first time i receive the frame it should also be a previous.
