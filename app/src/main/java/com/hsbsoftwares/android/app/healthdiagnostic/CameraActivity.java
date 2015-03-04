@@ -23,6 +23,9 @@ import org.opencv.core.Mat;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 
+import java.util.List;
+import java.util.ListIterator;
+
 /**
  * Created by Harpreet Singh Bola on 24/02/2015.
  */
@@ -45,6 +48,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
     Rect sel = new Rect();
 
+    //List for storing supported Fps range
+    List<int[]> supportedPreviewFpsRange;
+
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -54,6 +60,17 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                     Log.i(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
                     mOpenCvCameraView.setOnTouchListener(CameraActivity.this);
+
+                    //Getting supported Fps range
+                    supportedPreviewFpsRange = mOpenCvCameraView.getSupportedPreviewFpsRange();
+                    Log.i(TAG, "FpsRange size: " + supportedPreviewFpsRange.size());
+                    for (ListIterator<int[]> iter = supportedPreviewFpsRange.listIterator(); iter.hasNext();) {
+                        int[] element = iter.next();
+                        Log.i(TAG, "MIN FPS: " + element[0] + " MAX FPS: " + element[1]);
+                    }
+                    //Setting the maximum range supported which is in the last position of the list
+                    mOpenCvCameraView.setSupportedPreviewFpsRange(supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[0],
+                            supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[1]);
                 } break;
                 default:
                 {

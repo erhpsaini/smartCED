@@ -64,4 +64,12 @@ public class CameraView extends JavaCameraView {
         //params.setPictureSize(mSize.width, mSize.height);
         //mCamera.setParameters(params);
     }
+
+    public  List<int[]>  getSupportedPreviewFpsRange (){
+        return mCamera.getParameters().getSupportedPreviewFpsRange();
+    }
+
+    public void setSupportedPreviewFpsRange (int min, int max){
+        mCamera.getParameters().setPreviewFpsRange(min, max);
+    }
 }
