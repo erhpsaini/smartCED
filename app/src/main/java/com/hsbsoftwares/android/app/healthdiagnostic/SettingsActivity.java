@@ -27,6 +27,7 @@ import java.util.List;
  * API Guide</a> for more information on developing a Settings UI.
  */
 public class SettingsActivity extends PreferenceActivity {
+    private static final String TAG = "SettingsActivity";
 
     public static final int DEFAULT_THRESHOLD_VALUE = 60;
     /**
