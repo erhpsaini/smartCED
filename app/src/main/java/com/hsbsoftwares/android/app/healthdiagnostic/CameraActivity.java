@@ -62,9 +62,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                     Log.i(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
                     mOpenCvCameraView.setOnTouchListener(CameraActivity.this);
-                    /*
+
                     //Getting supported Fps range
-                    supportedPreviewFpsRange = mOpenCvCameraView.getSupportedPreviewFpsRange();
+                    /*supportedPreviewFpsRange = mOpenCvCameraView.getSupportedPreviewFpsRange();
                     Log.i(TAG, "FpsRange size: " + supportedPreviewFpsRange.size());
                     for (ListIterator<int[]> iter = supportedPreviewFpsRange.listIterator(); iter.hasNext();) {
                         int[] element = iter.next();
@@ -147,7 +147,18 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     }
 
     public void onCameraViewStarted(int width, int height) {
-        mMotionDetection = mMotionDetection.getInstance(width, height, BASE_FRAME_TYPE, mContext);
+        //Getting supported Fps range
+        /*supportedPreviewFpsRange = mOpenCvCameraView.getSupportedPreviewFpsRange();
+        Log.i(TAG, "FpsRange size: " + supportedPreviewFpsRange.size());
+        for (ListIterator<int[]> iter = supportedPreviewFpsRange.listIterator(); iter.hasNext();) {
+            int[] element = iter.next();
+            Log.i(TAG, "MIN FPS: " + element[0] + " MAX FPS: " + element[1]);
+        }
+        //Setting the maximum range supported which is in the last position of the list
+        mOpenCvCameraView.setSupportedPreviewFpsRange(supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[0],
+                supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[1]);*/
+
+        mMotionDetection = mMotionDetection.getInstance(width, height, BASE_FRAME_TYPE);
         mMotionDetection.setmFirstTime(true);
     }
 

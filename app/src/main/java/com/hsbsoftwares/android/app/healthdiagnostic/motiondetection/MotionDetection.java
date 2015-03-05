@@ -1,9 +1,11 @@
 package com.hsbsoftwares.android.app.healthdiagnostic.motiondetection;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.hsbsoftwares.android.app.healthdiagnostic.CameraActivity;
+import com.hsbsoftwares.android.app.healthdiagnostic.SettingsActivity;
 
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -16,30 +18,33 @@ public class MotionDetection {
 
     private static final String TAG = "MotionDetection";
 
-    private final Context mContext;
-
-    //This class must be singleton because it is used by openCV JavaCameraView's callbacks
+    //This class must be singleton to avoid memory leaks because it is used by openCV JavaCameraView's callbacks.
     private static MotionDetection instance = null;
 
     private static boolean  mFirstTime = true;
     private static boolean  mSecondTime = true;
 
+    private static final int WHITE_PIXEL = 255;
+
     private static Mat  mPreviousFrame;
     private static Mat  mLastThirdFrame;
     private static Mat  mResultFrame;
 
-    private static int mThreshold;
+    private static int mThreshold = SettingsActivity.getDefaultThresholdValue();
 
-    private MotionDetection(int frameWidth, int frameHeight, int frameType, Context context){
+    private MotionDetection(int frameWidth, int frameHeight, int frameType){
         mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
         mLastThirdFrame = new Mat(frameWidth, frameHeight, frameType);
         mResultFrame = new Mat(frameWidth, frameHeight, frameType);
-        this.mContext = context;
     }
 
-    public static MotionDetection getInstance(int frameWidth, int frameHeight, int frameType, Context context){
+    public static MotionDetection getInstance(int frameWidth, int frameHeight, int frameType){
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CameraActivity.getAppContext());
+        mThreshold = prefs.getInt("motion_detection_threshold_picker", SettingsActivity.getDefaultThresholdValue());
+        Log.i(TAG, "Selected threshold is " + mThreshold);
+
         if(instance == null){
-            instance = new MotionDetection(frameWidth, frameHeight, frameType, context);
+            instance = new MotionDetection(frameWidth, frameHeight, frameType);
         }else{
             mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
             mLastThirdFrame = new Mat(frameWidth, frameHeight, frameType);
@@ -60,9 +65,6 @@ public class MotionDetection {
      * Algorithm to detect motion using absdiff().
      */
     public Mat detectMotion(final Mat currentGrayFrame){
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
-        String detectionMethod = prefs.getString("motion_detection_algorithm_list", "0");
-        Log.i(TAG, "Selected movement detection method is " + detectionMethod);
         if(mFirstTime){
     		/*
     		 * The first time i receive the frame it should also be a previous.
@@ -78,7 +80,7 @@ public class MotionDetection {
         //Calculating the absolute difference between the current and previous frame.
         Core.absdiff(currentGrayFrame, mPreviousFrame, mResultFrame);
         //Image threshold: all the pixel values greater than 60 are converted to white (255) to better enhance the movement in the image.
-        Imgproc.threshold(mResultFrame, mResultFrame, 60, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(mResultFrame, mResultFrame, mThreshold, WHITE_PIXEL, Imgproc.THRESH_BINARY);
         //saving the current frame as previous.
         currentGrayFrame.copyTo(mPreviousFrame);
 
@@ -115,12 +117,12 @@ public class MotionDetection {
         //Calculating the absolute difference between the current and previous frame.
         Core.absdiff(mLastThirdFrame, mPreviousFrame, differenceFrame);//The difference between previousFrame and thirdLastFrame stored in differenceFrame.
         //Image threshold: all the pixel values greater than 60 are converted to white (255) to better enhance the movement in the image.
-        Imgproc.threshold(differenceFrame, differenceFrame, 60, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(differenceFrame, differenceFrame, mThreshold, WHITE_PIXEL, Imgproc.THRESH_BINARY);
 
         //Calculating the absolute difference between the current and previous frame.
         Core.absdiff(mPreviousFrame, currentGrayFrame, mResultFrame);// Using resultFrame to store difference to avoid using unnecessary memory.
         //Image threshold: all the pixel values greater than 60 are converted to white (255) to better enhance the movement in the image.
-        Imgproc.threshold(mResultFrame, mResultFrame, 60, 255, Imgproc.THRESH_BINARY);
+        Imgproc.threshold(mResultFrame, mResultFrame, mThreshold, WHITE_PIXEL, Imgproc.THRESH_BINARY);
 
         //Doing bitwise and between two differences to optimize the motion detection algorithm, in this way we are avoiding
         //the shadows/contrast created by movement

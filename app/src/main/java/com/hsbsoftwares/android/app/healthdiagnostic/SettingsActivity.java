@@ -29,7 +29,7 @@ import java.util.List;
 public class SettingsActivity extends PreferenceActivity {
     private static final String TAG = "SettingsActivity";
 
-    public static final int DEFAULT_THRESHOLD_VALUE = 60;
+    private static final int DEFAULT_THRESHOLD_VALUE = 60;
     /**
      * Determines whether to always show the simplified settings UI, where
      * settings are presented in a single list. When false, settings are shown
@@ -190,8 +190,7 @@ public class SettingsActivity extends PreferenceActivity {
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
         if(preference instanceof com.hsbsoftwares.android.app.healthdiagnostic.NumberPickerPreference){
-            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,
-                    PreferenceManager
+            sBindPreferenceSummaryToValueListener.onPreferenceChange(preference,PreferenceManager
                             .getDefaultSharedPreferences(preference.getContext())
                             .getInt(preference.getKey(), DEFAULT_THRESHOLD_VALUE));
         }else{
@@ -224,5 +223,9 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(findPreference("motion_detection_threshold_picker"));
 
         }
+    }
+
+    public static int getDefaultThresholdValue(){
+        return DEFAULT_THRESHOLD_VALUE;
     }
 }
