@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
@@ -47,6 +48,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private Mat mask;
 
     private MotionDetection mMotionDetection;
+
+    private static String mMotionDetectionMethod = SettingsActivity.getDefaultMotionDetectionMethod();
 
     Rect sel = new Rect();
 
@@ -157,9 +160,13 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         //Setting the maximum range supported which is in the last position of the list
         mOpenCvCameraView.setSupportedPreviewFpsRange(supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[0],
                 supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[1]);*/
+        mMotionDetectionMethod = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                .getString("motion_detection_algorithm_list", mMotionDetectionMethod);
+        Log.i(TAG, "Motion detection method: " + mMotionDetectionMethod);
 
         mMotionDetection = mMotionDetection.getInstance(width, height, BASE_FRAME_TYPE);
         mMotionDetection.setmFirstTime(true);
+        mMotionDetection.setmSecondTime(true);
     }
 
     public void onCameraViewStopped() {
@@ -175,7 +182,11 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         Mat currentGrayFrame = inputFrame.gray();
 
         if(mProcessingModeOn){
-            mResultFrame = mMotionDetection.detectMotion(currentGrayFrame);
+            if(mMotionDetectionMethod.equals("0")) {
+                mResultFrame = mMotionDetection.detectMotion(currentGrayFrame);
+            }else {
+                mResultFrame = mMotionDetection.detectMotion2(currentGrayFrame);
+            }
         }else{
             mResultFrame = inputFrame.rgba();
             if (mask != null) {
