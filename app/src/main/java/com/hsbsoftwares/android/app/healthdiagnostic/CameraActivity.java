@@ -176,18 +176,18 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        Log.i(TAG, "Resolution using cols() & rows()" + String.valueOf(inputFrame.rgba().cols() + "x" + inputFrame.rgba().rows()));
-        Log.i(TAG, "Resolution using width() & height()" + String.valueOf(inputFrame.rgba().width() + "x" + inputFrame.rgba().height()));
+        //Log.i(TAG, "Resolution using cols() & rows()" + String.valueOf(inputFrame.rgba().cols() + "x" + inputFrame.rgba().rows()));
+        //Log.i(TAG, "Resolution using width() & height()" + String.valueOf(inputFrame.rgba().width() + "x" + inputFrame.rgba().height()));
 
         Mat currentGrayFrame = inputFrame.gray();
 
-        if(mProcessingModeOn){
+        if(mProcessingModeOn) {
             if(mMotionDetectionMethod.equals("0")) {
                 mResultFrame = mMotionDetection.detectMotion(currentGrayFrame);
             }else {
                 mResultFrame = mMotionDetection.detectMotion2(currentGrayFrame);
             }
-        }else{
+        }else {
             mResultFrame = inputFrame.rgba();
             if (mask != null) {
                 Core.bitwise_and(mResultFrame, mask, mResultFrame);
