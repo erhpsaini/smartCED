@@ -1,7 +1,9 @@
 package com.hsbsoftwares.android.app.healthdiagnostic;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.hsbsoftwares.android.app.healthdiagnostic.motiondetection.MotionDetection;
 
@@ -239,9 +242,37 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         return false;
     }
 
-    /** Called when the user clicks the Settings button */
+    /* Called when the user clicks the Settings button */
     public void openSettingsActivity(View view) {
         startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    /* Called when the user clicks the view mode button */
+    public void showViewModePopupMenu(View view){
+        final CharSequence[] items = getResources().getStringArray(R.array.view_mode_popup_list_values);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(CameraActivity.this);
+        builder.setTitle("Select view mode");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                switch(which){
+                    case 0:
+                        Toast.makeText(getApplicationContext(), items[which] + " mode on", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 1:
+                        Toast.makeText(getApplicationContext(), items[which] + " mode on", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 2:
+                        Toast.makeText(getApplicationContext(), items[which] + " mode on", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 3:
+                        Toast.makeText(getApplicationContext(), items[which] + " mode on", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
     }
 
     public static Context getAppContext(){

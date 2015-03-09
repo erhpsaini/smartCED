@@ -37,4 +37,16 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"/>
 
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher"
+        style="?android:attr/borderlessButtonStyle"
+        android:contentDescription="@string/view_mode"
+        android:id="@+id/viewModeButton"
+        android:layout_above="@+id/settingsButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="showViewModePopupMenu" />
+
 </RelativeLayout>

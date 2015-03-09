@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">Health Diagnostic</string>
     <string name="start_processing">Process</string>
+    <string name="view_mode">View mode</string>
 </resources>

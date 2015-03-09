@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="view_mode_popup_list_values">
+        <item>None</item>
+        <item>Color/Single diff</item>
+        <item>Color/Double diff</item>
+        <item>Single diff/Double diff</item>
+    </string-array>
+</resources>
