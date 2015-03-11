@@ -65,6 +65,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
     private static String mMotionDetectionMethod = SettingsActivity.getDefaultMotionDetectionMethod();
 
+    ImageButton mProcessButton;
+
     Rect sel = new Rect();
 
     //List for storing supported Fps range
@@ -112,8 +114,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         mContext = getApplicationContext();
 
-        ImageButton processButton;
-
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Set full screen view
@@ -129,15 +129,15 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        processButton = (ImageButton) findViewById(R.id.processButton);
-        processButton.setOnClickListener(new View.OnClickListener() {
+        mProcessButton = (ImageButton) findViewById(R.id.processButton);
+        mProcessButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 mProcessingModeOn = !mProcessingModeOn;
             }
         });
 
         //ArrayList<View> views = new ArrayList<View>();
-        //views.add(findViewById(R.id.processButton));
+        //views.add(findViewById(R.id.mProcessButton));
         //views.add(findViewById(R.id.settingsButton));
         //mOpenCvCameraView.addTouchables(views);
     }
@@ -273,16 +273,19 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                     case RGBA_VIEW:
+                        mProcessButton.setVisibility(View.VISIBLE);
                         mMultipleViewModeOn = false;
                         Toast.makeText(getApplicationContext(), "Multiple view mode off.", Toast.LENGTH_SHORT).show();
                         break;
                     case GRAY_SINGLE_DIFF_VIEW:
+                        mProcessButton.setVisibility(View.INVISIBLE);
                         mMultipleViewModeOn = true;
                         mViewMode = GRAY_SINGLE_DIFF_VIEW;
                         mMotionDetection.setmFirstTime(true);
                         Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
                     case GRAY_DOUBLE_DIFF_VIEW:
+                        mProcessButton.setVisibility(View.INVISIBLE);
                         mMultipleViewModeOn = true;
                         mViewMode = GRAY_DOUBLE_DIFF_VIEW;
                         mMotionDetection.setmFirstTime(true);
@@ -290,6 +293,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                         Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
                     case SINGLE_DOUBLE_DIFF_VIEW:
+                        mProcessButton.setVisibility(View.INVISIBLE);
                         mMultipleViewModeOn = true;
                         mViewMode = SINGLE_DOUBLE_DIFF_VIEW;
                         mMotionDetection.setmFirstTime(true);
