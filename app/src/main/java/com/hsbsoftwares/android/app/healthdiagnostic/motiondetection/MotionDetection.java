@@ -27,6 +27,7 @@ public class MotionDetection {
     private static final int WHITE_PIXEL = 255;
 
     private static Mat  mPreviousFrame;
+    private static Mat  mPreviousFrame2;
     private static Mat  mLastThirdFrame;
     private static Mat  mResultFrame;
 
@@ -34,6 +35,7 @@ public class MotionDetection {
 
     private MotionDetection(int frameWidth, int frameHeight, int frameType){
         mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
+        mPreviousFrame2 = new Mat(frameWidth, frameHeight, frameType);
         mLastThirdFrame = new Mat(frameWidth, frameHeight, frameType);
         mResultFrame = new Mat(frameWidth, frameHeight, frameType);
     }
@@ -47,6 +49,7 @@ public class MotionDetection {
             instance = new MotionDetection(frameWidth, frameHeight, frameType);
         }else{
             mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
+            mPreviousFrame2 = new Mat(frameWidth, frameHeight, frameType);
             mLastThirdFrame = new Mat(frameWidth, frameHeight, frameType);
             mResultFrame = new Mat(frameWidth, frameHeight, frameType);
         }
@@ -100,7 +103,7 @@ public class MotionDetection {
     		/*
     		 * The first time i receive the frame it should also be a previous and as last third.
     		 */
-            currentGrayFrame.copyTo(mPreviousFrame);
+            currentGrayFrame.copyTo(mPreviousFrame2);
             currentGrayFrame.copyTo(mLastThirdFrame);
             mFirstTime = false;
             Log.d(TAG, "First time processing: First frame set up as previous and third frame!");
@@ -110,17 +113,17 @@ public class MotionDetection {
     		/*
     		 * The second time the second frame should be set as third
     		 */
-            mPreviousFrame.copyTo(mLastThirdFrame);
+            mPreviousFrame2.copyTo(mLastThirdFrame);
             mSecondTime = false;
         }
 
         //Calculating the absolute difference between the current and previous frame.
-        Core.absdiff(mLastThirdFrame, mPreviousFrame, differenceFrame);//The difference between previousFrame and thirdLastFrame stored in differenceFrame.
+        Core.absdiff(mLastThirdFrame, mPreviousFrame2, differenceFrame);//The difference between previousFrame and thirdLastFrame stored in differenceFrame.
         //Image threshold: all the pixel values greater than 60 are converted to white (255) to better enhance the movement in the image.
         Imgproc.threshold(differenceFrame, differenceFrame, mThreshold, WHITE_PIXEL, Imgproc.THRESH_BINARY);
 
         //Calculating the absolute difference between the current and previous frame.
-        Core.absdiff(mPreviousFrame, currentGrayFrame, mResultFrame);// Using resultFrame to store difference to avoid using unnecessary memory.
+        Core.absdiff(mPreviousFrame2, currentGrayFrame, mResultFrame);// Using resultFrame to store difference to avoid using unnecessary memory.
         //Image threshold: all the pixel values greater than 60 are converted to white (255) to better enhance the movement in the image.
         Imgproc.threshold(mResultFrame, mResultFrame, mThreshold, WHITE_PIXEL, Imgproc.THRESH_BINARY);
 
@@ -130,9 +133,9 @@ public class MotionDetection {
         //Imgproc.threshold(mResultRgba, mResultRgba, 60, 255, Imgproc.THRESH_BINARY); // Doing something different??
 
         ////saving the previous frame as last of three recent frames.
-        mPreviousFrame.copyTo(mLastThirdFrame);
+        mPreviousFrame2.copyTo(mLastThirdFrame);
         //saving the current frame as previous.
-        currentGrayFrame.copyTo(mPreviousFrame);
+        currentGrayFrame.copyTo(mPreviousFrame2);
 
         //Releasing memory
         differenceFrame.release();
@@ -142,6 +145,7 @@ public class MotionDetection {
 
     public void releaseMemory(){
         mPreviousFrame.release();
+        mPreviousFrame2.release();
         mLastThirdFrame.release();
         mResultFrame.release();
     }

@@ -25,8 +25,11 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
+import org.opencv.imgproc.Imgproc;
 
 import java.util.List;
 
@@ -39,18 +42,26 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private static Context mContext;
 
     private static boolean mProcessingModeOn = false;
+    private static boolean mMultipleViewModeOn = false;
+    private static boolean mFirstTime = true;
 
     private static int touchNumbers;
     private static final int BASE_FRAME_WIDTH = 640;
     private static final int BASE_FRAME_HEIGHT = 480;
     private static final int BASE_FRAME_TYPE = CvType.CV_8U;
+    private static final int RGBA_VIEW = 0;
+    private static final int GRAY_SINGLE_DIFF_VIEW = 1;
+    private static final int GRAY_DOUBLE_DIFF_VIEW = 2;
+    private static final int SINGLE_DOUBLE_DIFF_VIEW = 3;
+
+    private static int mViewMode = RGBA_VIEW;
 
     private CameraView mOpenCvCameraView;
 
     private Mat mResultFrame;
     private Mat mask;
 
-    private MotionDetection mMotionDetection;
+    private static MotionDetection mMotionDetection;
 
     private static String mMotionDetectionMethod = SettingsActivity.getDefaultMotionDetectionMethod();
 
@@ -170,6 +181,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mMotionDetection = mMotionDetection.getInstance(width, height, BASE_FRAME_TYPE);
         mMotionDetection.setmFirstTime(true);
         mMotionDetection.setmSecondTime(true);
+
+        mFirstTime = true;
     }
 
     public void onCameraViewStopped() {
@@ -183,22 +196,25 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         //Log.i(TAG, "Resolution using width() & height()" + String.valueOf(inputFrame.rgba().width() + "x" + inputFrame.rgba().height()));
 
         Mat currentGrayFrame = inputFrame.gray();
-
-        if(mProcessingModeOn) {
-            if(mMotionDetectionMethod.equals("0")) {
-                mResultFrame = mMotionDetection.detectMotion(currentGrayFrame);
-            }else {
-                mResultFrame = mMotionDetection.detectMotion2(currentGrayFrame);
-            }
+        if(mMultipleViewModeOn) {
+            return createMultipleFrameView(currentGrayFrame, mViewMode);
         }else {
-            mResultFrame = inputFrame.rgba();
-            if (mask != null) {
-                Core.bitwise_and(mResultFrame, mask, mResultFrame);
+            if(mProcessingModeOn) {
+                if(mMotionDetectionMethod.equals("0")) {
+                    mResultFrame = mMotionDetection.detectMotion(currentGrayFrame);
+                }else {
+                    mResultFrame = mMotionDetection.detectMotion2(currentGrayFrame);
+                }
+            }else {
+                mResultFrame = inputFrame.rgba();
+                if (mask != null) {
+                    Core.bitwise_and(mResultFrame, mask, mResultFrame);
+                }
             }
+            //releasing Mat to avoid memory leaks
+            currentGrayFrame.release();
+            return mResultFrame;
         }
-        //releasing Mat to avoid memory leaks
-        currentGrayFrame.release();
-        return mResultFrame;
     }
 
     @Override
@@ -255,18 +271,31 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         builder.setTitle("Select view mode");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                switch(which){
-                    case 0:
-                        Toast.makeText(getApplicationContext(), items[which] + " mode on", Toast.LENGTH_SHORT).show();
+                switch(which) {
+                    case RGBA_VIEW:
+                        mMultipleViewModeOn = false;
+                        Toast.makeText(getApplicationContext(), "Multiple view mode off.", Toast.LENGTH_SHORT).show();
                         break;
-                    case 1:
-                        Toast.makeText(getApplicationContext(), items[which] + " mode on", Toast.LENGTH_SHORT).show();
+                    case GRAY_SINGLE_DIFF_VIEW:
+                        mMultipleViewModeOn = true;
+                        mViewMode = GRAY_SINGLE_DIFF_VIEW;
+                        mMotionDetection.setmFirstTime(true);
+                        Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
-                    case 2:
-                        Toast.makeText(getApplicationContext(), items[which] + " mode on", Toast.LENGTH_SHORT).show();
+                    case GRAY_DOUBLE_DIFF_VIEW:
+                        mMultipleViewModeOn = true;
+                        mViewMode = GRAY_DOUBLE_DIFF_VIEW;
+                        mMotionDetection.setmFirstTime(true);
+                        mMotionDetection.setmSecondTime(true);
+                        Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
-                    case 3:
-                        Toast.makeText(getApplicationContext(), items[which] + " mode on", Toast.LENGTH_SHORT).show();
+                    case SINGLE_DOUBLE_DIFF_VIEW:
+                        mMultipleViewModeOn = true;
+                        mViewMode = SINGLE_DOUBLE_DIFF_VIEW;
+                        mMotionDetection.setmFirstTime(true);
+                        mMotionDetection.setmSecondTime(true);
+                        mFirstTime = true;
+                        Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
@@ -277,5 +306,65 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
     public static Context getAppContext(){
         return mContext;
+    }
+
+    private static Mat createMultipleFrameView(final Mat currentGrayFrame, final int viewMode){
+        Mat currentGrayFrameCopy = new Mat(currentGrayFrame.size(), currentGrayFrame.type());
+        currentGrayFrame.copyTo(currentGrayFrameCopy);
+        Mat processedFrameSingleDiff;
+        Mat processedFrameDoubleDiff;
+        Mat subSx = currentGrayFrame.submat(0, currentGrayFrame.rows(), 0, currentGrayFrame.cols()/2);
+        Mat subDx = currentGrayFrame.submat(0, currentGrayFrame.rows(), currentGrayFrame.cols()/2, currentGrayFrame.cols());
+
+        Size subSxSize = subSx.size();
+        Size subDxSize = subDx.size();
+
+        Imgproc.resize(currentGrayFrame, subSx, subSxSize);
+
+        switch(viewMode) {
+            default:
+                subSx.release();
+                subDx.release();
+                currentGrayFrameCopy.release();
+                break;
+            case GRAY_SINGLE_DIFF_VIEW:
+                processedFrameSingleDiff = mMotionDetection.detectMotion(currentGrayFrameCopy);
+                Imgproc.resize(processedFrameSingleDiff, subDx, subDxSize);
+                Core.rectangle(subDx, new Point(1, 1), new Point(subDxSize.width - 2, subDxSize.height - 2), new Scalar(255, 0, 0, 255), 2);
+                processedFrameSingleDiff.release();
+                subSx.release();
+                subDx.release();
+                currentGrayFrameCopy.release();
+                break;
+            case GRAY_DOUBLE_DIFF_VIEW:
+                processedFrameDoubleDiff = mMotionDetection.detectMotion2(currentGrayFrameCopy);
+                Imgproc.resize(processedFrameDoubleDiff, subDx, subDxSize);
+                Core.rectangle(subDx, new Point(1, 1), new Point(subDxSize.width - 2, subDxSize.height - 2), new Scalar(255, 0, 0, 255), 2);
+                processedFrameDoubleDiff.release();
+                subSx.release();
+                subDx.release();
+                currentGrayFrameCopy.release();
+                break;
+            case SINGLE_DOUBLE_DIFF_VIEW:
+                processedFrameSingleDiff = mMotionDetection.detectMotion(currentGrayFrameCopy);
+                Imgproc.resize(processedFrameSingleDiff, subSx, subSxSize);
+                if(mFirstTime) {
+                    mMotionDetection.setmFirstTime(true);
+                    mFirstTime = false;
+                }
+                processedFrameDoubleDiff = mMotionDetection.detectMotion2(currentGrayFrameCopy);
+                Imgproc.resize(processedFrameDoubleDiff, subDx, subDx.size());
+                Core.rectangle(subSx, new Point(1, 1), new Point(subSxSize.width - 2, subSxSize.height - 2), new Scalar(255, 0, 0, 255), 2);
+                Core.rectangle(subDx, new Point(1, 1), new Point(subDxSize.width - 2, subDxSize.height - 2), new Scalar(255, 0, 0, 255), 2);
+                processedFrameSingleDiff.release();
+                processedFrameDoubleDiff.release();
+                subSx.release();
+                subDx.release();
+                currentGrayFrameCopy.release();
+                break;
+        }
+
+        return currentGrayFrame;
+
     }
 }
