@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
@@ -40,6 +41,10 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private static final String TAG = "CameraActivity";
 
     private static Context mContext;
+    //Display size
+    private static android.graphics.Point mDisplaySize;
+
+    //private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     private static boolean mProcessingModeOn = false;
     private static boolean mMultipleViewModeOn = false;
@@ -103,6 +108,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
     public CameraActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
+        //paint.setColor(Color.GREEN);
+        //paint.setStyle(Paint.Style.STROKE);
     }
 
     /** Called when the activity is first created. */
@@ -135,6 +142,11 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                 mProcessingModeOn = !mProcessingModeOn;
             }
         });
+
+        //Getting display size and saving it in a member variable.
+        Display display = getWindowManager().getDefaultDisplay();
+        mDisplaySize = new android.graphics.Point();
+        display.getSize(mDisplaySize);
 
         //ArrayList<View> views = new ArrayList<View>();
         //views.add(findViewById(R.id.mProcessButton));
@@ -228,11 +240,28 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             int cols = mResultFrame.cols();
             int rows = mResultFrame.rows();
 
-            int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
+            //Mapping formula from openCV's official example
+            /*int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
             int yOffset = (mOpenCvCameraView.getHeight() - rows) / 2;
-
             int x = (int)event.getX() - xOffset;
-            int y = (int)event.getY() - yOffset;
+            int y = (int)event.getY() - yOffset;*/
+
+            //Second mapping formula...working better! :)
+            int width = (int)mDisplaySize.x;
+            int height = (int)mDisplaySize.y;
+            //Formula.
+            int x = ((int)event.getX()*cols)/width;
+            int y = ((int)event.getY()*rows)/height;
+
+            // Check whether the object holds a valid surface
+            /*if (mOpenCvCameraView.getmSurfaceHolder().getSurface().isValid()) {
+                // Start editing the surface
+                Canvas canvas = mOpenCvCameraView.getmSurfaceHolder().lockCanvas();
+                canvas.drawColor(Color.BLACK);
+                //canvas.drawCircle(event.getX(), event.getY(), 100, paint);
+                mOpenCvCameraView.getmSurfaceHolder().unlockCanvasAndPost(canvas);
+            }*/
+
             if (x<0||y<0||x>=cols||y>=rows) return false;
             if ((sel.x==0 && sel.y==0) || (sel.width!=0 && sel.height!=0))
             {
@@ -250,7 +279,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                 mask = Mat.zeros(mResultFrame.size(), mResultFrame.type());
                 mask.submat(sel).setTo(Scalar.all(255));
             }
-            Log.w("touch",sel.toString());
+            Log.w("touch", sel.toString());
         }else{
             touchNumbers = 0;
             mask = null;

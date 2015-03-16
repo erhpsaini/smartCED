@@ -4,6 +4,7 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.SurfaceHolder;
 
 import org.opencv.android.JavaCameraView;
 
@@ -18,9 +19,12 @@ public class CameraView extends JavaCameraView {
 
     // The chosen resolution will be stored in mSize.
     Camera.Size mSize;
+    //The surface holder
+    private final SurfaceHolder mSurfaceHolder;
 
     public CameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        mSurfaceHolder = getHolder();
     }
 
     public List<Camera.Size> getResolutionList() {
@@ -71,5 +75,9 @@ public class CameraView extends JavaCameraView {
 
     public void setSupportedPreviewFpsRange (int min, int max){
         mCamera.getParameters().setPreviewFpsRange(min, max);
+    }
+
+    public SurfaceHolder getmSurfaceHolder() {
+        return mSurfaceHolder;
     }
 }
