@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
@@ -32,6 +33,7 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,6 +51,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private static boolean mProcessingModeOn = false;
     private static boolean mMultipleViewModeOn = false;
     private static boolean mFirstTime = true;
+    //Booleans used with timer
+    private static boolean mTimerHasStarted = false;
+    private static boolean mIsCounting = false;
 
     private static int touchNumbers;
     private static final int BASE_FRAME_WIDTH = 640;
@@ -58,6 +63,11 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private static final int GRAY_SINGLE_DIFF_VIEW = 1;
     private static final int GRAY_DOUBLE_DIFF_VIEW = 2;
     private static final int SINGLE_DOUBLE_DIFF_VIEW = 3;
+    //Timer constants
+    private final long START_TIME = 10000;
+    private final long INTERVAL = 1000;
+
+    private static ProcessingCountDownTimer MmyCountDownTimer;
 
     private static int mViewMode = RGBA_VIEW;
 
@@ -75,7 +85,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     Rect sel = new Rect();
 
     //List for storing supported Fps range
-    List<int[]> supportedPreviewFpsRange;
+    List <int[]> supportedPreviewFpsRange;
+    //ArrayList to store white pixels of frames
+    ArrayList <Integer> mLumArrayList;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -110,6 +122,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         Log.i(TAG, "Instantiated new " + this.getClass());
         //paint.setColor(Color.GREEN);
         //paint.setStyle(Paint.Style.STROKE);
+        mLumArrayList = new ArrayList<Integer>();
     }
 
     /** Called when the activity is first created. */
@@ -147,6 +160,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         Display display = getWindowManager().getDefaultDisplay();
         mDisplaySize = new android.graphics.Point();
         display.getSize(mDisplaySize);
+
+        MmyCountDownTimer = new ProcessingCountDownTimer(START_TIME, INTERVAL);
 
         //ArrayList<View> views = new ArrayList<View>();
         //views.add(findViewById(R.id.mProcessButton));
@@ -206,7 +221,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         //Log.i(TAG, "Resolution using cols() & rows()" + String.valueOf(inputFrame.rgba().cols() + "x" + inputFrame.rgba().rows()));
         //Log.i(TAG, "Resolution using width() & height()" + String.valueOf(inputFrame.rgba().width() + "x" + inputFrame.rgba().height()));
-
         Mat currentGrayFrame = inputFrame.gray();
         if(mMultipleViewModeOn) {
             return createMultipleFrameView(currentGrayFrame, mViewMode);
@@ -217,14 +231,24 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                 }else {
                     mResultFrame = mMotionDetection.detectMotion2(currentGrayFrame);
                 }
+                if(!mTimerHasStarted){
+                    mTimerHasStarted = true;
+                    MmyCountDownTimer.start();
+                    mIsCounting = true;
+                }
+                if(mIsCounting){
+                    mLumArrayList.add(mLumArrayList.size(), Core.countNonZero(mResultFrame));
+                }else{
+                    Log.i(TAG, "Size of Lum list is " + mLumArrayList.size());
+                }
             }else {
-                mResultFrame = inputFrame.rgba();
+                mResultFrame = currentGrayFrame;
                 if (mask != null) {
                     Core.bitwise_and(mResultFrame, mask, mResultFrame);
                 }
             }
             //releasing Mat to avoid memory leaks
-            currentGrayFrame.release();
+            //currentGrayFrame.release();
             return mResultFrame;
         }
     }
@@ -346,7 +370,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         currentGrayFrame.copyTo(currentGrayFrameCopy);
         Mat processedFrameSingleDiff;
         Mat processedFrameDoubleDiff;
-        Mat subSx = currentGrayFrame.submat(0, currentGrayFrame.rows(), 0, currentGrayFrame.cols()/2);
+        Mat subSx = currentGrayFrame.submat(0, currentGrayFrame.rows(), 0, currentGrayFrame.cols() / 2);
         Mat subDx = currentGrayFrame.submat(0, currentGrayFrame.rows(), currentGrayFrame.cols()/2, currentGrayFrame.cols());
 
         Size subSxSize = subSx.size();
@@ -399,5 +423,26 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         return currentGrayFrame;
 
+    }
+
+    public class ProcessingCountDownTimer extends CountDownTimer {
+
+        public ProcessingCountDownTimer(long startTime, long interval){
+            super(startTime, interval);
+        }
+
+        @Override
+        public void onTick(long millisUntilFinished) {
+            Log.i(TAG, "" + (int) (millisUntilFinished/1000));
+            //Toast.makeText(getApplicationContext(), "" + (int) (millisUntilFinished/1000), Toast.LENGTH_SHORT);
+        }
+
+        @Override
+        public void onFinish() {
+            //mTimerHasStarted = false;
+            mIsCounting = false;
+            Log.i(TAG, "Done with timer!");
+            //Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT);
+        }
     }
 }
