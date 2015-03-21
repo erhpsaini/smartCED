@@ -40,7 +40,17 @@ import java.util.List;
  * Created by Harpreet Singh Bola on 24/02/2015.
  */
 public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, View.OnTouchListener {
+
     private static final String TAG = "CameraActivity";
+
+    static {
+        try {
+            System.loadLibrary("native_lib");
+        } catch (UnsatisfiedLinkError e) {
+            Log.e(TAG, "Failed to load native_lib");
+
+        }
+    }
 
     private static Context mContext;
     //Display size
