@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * Created by Harpreet Singh Bola on 24/02/2015.
  */
-public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, View.OnTouchListener {
+public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, View.OnTouchListener, IEmergencyAlarmListener {
 
     private static final String TAG = "CameraActivity";
 
@@ -64,6 +64,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     //Booleans used with timer
     private static boolean mTimerHasStarted = false;
     private static boolean mIsCounting = false;
+    private static boolean mTimeOut = false;
 
     private static int touchNumbers;
     private static final int BASE_FRAME_WIDTH = 640;
@@ -77,7 +78,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private final long START_TIME = 10000;
     private final long INTERVAL = 1000;
 
-    private static ProcessingCountDownTimer MmyCountDownTimer;
+    private static ProcessingCountDownTimer mMyCountDownTimer;
 
     private static int mViewMode = RGBA_VIEW;
 
@@ -91,6 +92,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private static String mMotionDetectionMethod = SettingsActivity.getDefaultMotionDetectionMethod();
 
     ImageButton mProcessButton;
+    ImageButton mEmergencyButton;
 
     Rect sel = new Rect();
 
@@ -166,12 +168,24 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             }
         });
 
+        mEmergencyButton = (ImageButton) findViewById(R.id.emergencyButton);
+        if(mEmergencyButton.getVisibility() == View.VISIBLE){
+            mEmergencyButton.setVisibility(View.INVISIBLE);
+        }
+        mEmergencyButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if(mEmergencyButton.getVisibility() == View.VISIBLE){
+                    mEmergencyButton.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
         //Getting display size and saving it in a member variable.
         Display display = getWindowManager().getDefaultDisplay();
         mDisplaySize = new android.graphics.Point();
         display.getSize(mDisplaySize);
 
-        MmyCountDownTimer = new ProcessingCountDownTimer(START_TIME, INTERVAL);
+        mMyCountDownTimer = new ProcessingCountDownTimer(START_TIME, INTERVAL);
 
         //ArrayList<View> views = new ArrayList<View>();
         //views.add(findViewById(R.id.mProcessButton));
@@ -243,13 +257,19 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                 }
                 if(!mTimerHasStarted){
                     mTimerHasStarted = true;
-                    MmyCountDownTimer.start();
+                    mMyCountDownTimer.start();
                     mIsCounting = true;
                 }
                 if(mIsCounting){
                     mLumArrayList.add(mLumArrayList.size(), Core.countNonZero(mResultFrame));
                 }else{
-                    Log.i(TAG, "Size of Lum list is " + mLumArrayList.size());
+                    //Log.i(TAG, "Size of Lum list is " + mLumArrayList.size());
+                }
+                if(mTimeOut){
+                    PathologyProcessingTask pathologyProcessingTask = new PathologyProcessingTask(mContext);
+                    pathologyProcessingTask.setmEmergencyAlarmListener(this);
+                    pathologyProcessingTask.execute(mLumArrayList);
+                    mTimeOut = false;
                 }
             }else {
                 mResultFrame = currentGrayFrame;
@@ -451,8 +471,16 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         public void onFinish() {
             //mTimerHasStarted = false;
             mIsCounting = false;
+            mTimeOut = true;
             Log.i(TAG, "Done with timer!");
             //Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT);
+        }
+    }
+
+    @Override
+    public void onEmergency() {
+        if(mEmergencyButton.getVisibility() == View.INVISIBLE){
+            mEmergencyButton.setVisibility(View.VISIBLE);
         }
     }
 }
