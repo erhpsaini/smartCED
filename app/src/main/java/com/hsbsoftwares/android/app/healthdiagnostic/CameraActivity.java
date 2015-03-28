@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.gesture.GestureOverlayView;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
@@ -115,6 +114,8 @@ import java.util.ArrayList;
     //ArrayList to store white pixels of frames
     private ArrayList<Integer> mLumArrayList;
 
+    private static Ringtone mEmergencyRingtone;
+
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -207,6 +208,9 @@ import java.util.ArrayList;
                 if(mEmergencyButton.getVisibility() == View.VISIBLE){
                     mEmergencyButton.setVisibility(View.INVISIBLE);
                 }
+                if(mEmergencyRingtone.isPlaying()){
+                    mEmergencyRingtone.stop();
+                }
             }
         });
 
@@ -228,6 +232,12 @@ import java.util.ArrayList;
         display.getSize(mDisplaySize);
 
         mMyCountDownTimer = new ProcessingCountDownTimer(START_TIME, INTERVAL);
+
+        try {
+            mEmergencyRingtone = RingtoneManager.getRingtone(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //ArrayList<View> views = new ArrayList<View>();
         //views.add(findViewById(R.id.mProcessButton));
@@ -555,13 +565,8 @@ import java.util.ArrayList;
         if(mEmergencyButton.getVisibility() == View.INVISIBLE){
             mEmergencyButton.setVisibility(View.VISIBLE);
         }
-
-        try {
-            Uri emergencyNotification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), emergencyNotification);
-            ringtone.play();
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(!mEmergencyRingtone.isPlaying()){
+            mEmergencyRingtone.play();
         }
     }
 
