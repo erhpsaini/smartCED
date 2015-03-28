@@ -6,4 +6,9 @@
         <item>Color/Double diff</item>
         <item>Single diff/Double diff</item>
     </string-array>
+
+    <string-array name="mask_creation_popup_list_values">
+        <item>Create mask</item>
+        <item>Clear mask</item>
+    </string-array>
 </resources>

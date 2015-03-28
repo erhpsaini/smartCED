@@ -4,4 +4,7 @@
     <string name="settings">Settings</string>
     <string name="view_mode">View mode</string>
     <string name="emergency">Emergency</string>
+    <string name="mask">Mask</string>
+    <string name="confirm_mask">Confirm mask</string>
+    <string name="discard_mask">Discard mask</string>
 </resources>

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.gesture.GestureOverlayView;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
@@ -34,12 +35,11 @@ import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Harpreet Singh Bola on 24/02/2015.
  */
-public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, View.OnTouchListener, IEmergencyAlarmListener {
+    public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, View.OnTouchListener, IEmergencyAlarmListener, GestureOverlayView.OnGestureListener {
 
     private static final String TAG = "CameraActivity";
 
@@ -85,19 +85,27 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private CameraView mOpenCvCameraView;
 
     private Mat mResultFrame;
-    private Mat mask;
+    private Mat mMask;
 
     private static MotionDetection mMotionDetection;
 
     private static String mMotionDetectionMethod = SettingsActivity.getDefaultMotionDetectionMethod();
 
-    ImageButton mProcessButton;
-    ImageButton mEmergencyButton;
+    private ImageButton mProcessButton;
+    private ImageButton mEmergencyButton;
+    private ImageButton mSettingsButton;
+    private ImageButton mViewModeButton;
+    private ImageButton mMaskButton;
+    private ImageButton mDiscardMaskButton;
+    private ImageButton mConfirmMaskButton;
 
-    Rect sel = new Rect();
+    private GestureOverlayView mGOV;
+
+    private Point mPSX, mPDX;
+    //Rect sel = new Rect();
 
     //List for storing supported Fps range
-    List <int[]> supportedPreviewFpsRange;
+    //List <int[]> supportedPreviewFpsRange;
     //ArrayList to store white pixels of frames
     ArrayList <Integer> mLumArrayList;
 
@@ -135,6 +143,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         //paint.setColor(Color.GREEN);
         //paint.setStyle(Paint.Style.STROKE);
         mLumArrayList = new ArrayList<Integer>();
+        mPSX = new Point();
+        mPDX = new Point();
     }
 
     /** Called when the activity is first created. */
@@ -179,6 +189,18 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                 }
             }
         });
+
+        mSettingsButton         = (ImageButton) findViewById(R.id.settingsButton);
+        mViewModeButton         = (ImageButton) findViewById(R.id.viewModeButton);
+        mMaskButton             = (ImageButton) findViewById(R.id.maskButton);
+        mDiscardMaskButton      = (ImageButton) findViewById(R.id.discardMaskButton);
+        mConfirmMaskButton      = (ImageButton) findViewById(R.id.confirmMaskButton);
+
+        mGOV = (GestureOverlayView)findViewById(R.id.gestureOverlayView);
+        mGOV.addOnGestureListener(CameraActivity.this);
+
+        //ImageView myImage = (ImageView) findViewById(R.id.imageView);
+        //myImage.setAlpha((float) 0.0);
 
         //Getting display size and saving it in a member variable.
         Display display = getWindowManager().getDefaultDisplay();
@@ -273,8 +295,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                 }
             }else {
                 mResultFrame = currentGrayFrame;
-                if (mask != null) {
-                    Core.bitwise_and(mResultFrame, mask, mResultFrame);
+                if (mMask != null) {
+                    Core.bitwise_and(mResultFrame, mMask, mResultFrame);
                 }
             }
             //releasing Mat to avoid memory leaks
@@ -286,58 +308,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         Log.i(TAG, "onTouch event");
-
-        //2 touch point mask
-        touchNumbers++;
-
-        if(touchNumbers != 3){
-            int cols = mResultFrame.cols();
-            int rows = mResultFrame.rows();
-
-            //Mapping formula from openCV's official example
-            /*int xOffset = (mOpenCvCameraView.getWidth() - cols) / 2;
-            int yOffset = (mOpenCvCameraView.getHeight() - rows) / 2;
-            int x = (int)event.getX() - xOffset;
-            int y = (int)event.getY() - yOffset;*/
-
-            //Second mapping formula...working better! :)
-            int width = (int)mDisplaySize.x;
-            int height = (int)mDisplaySize.y;
-            //Formula.
-            int x = ((int)event.getX()*cols)/width;
-            int y = ((int)event.getY()*rows)/height;
-
-            // Check whether the object holds a valid surface
-            /*if (mOpenCvCameraView.getmSurfaceHolder().getSurface().isValid()) {
-                // Start editing the surface
-                Canvas canvas = mOpenCvCameraView.getmSurfaceHolder().lockCanvas();
-                canvas.drawColor(Color.BLACK);
-                //canvas.drawCircle(event.getX(), event.getY(), 100, paint);
-                mOpenCvCameraView.getmSurfaceHolder().unlockCanvasAndPost(canvas);
-            }*/
-
-            if (x<0||y<0||x>=cols||y>=rows) return false;
-            if ((sel.x==0 && sel.y==0) || (sel.width!=0 && sel.height!=0))
-            {
-                mask = null;
-                sel.x=x; sel.y=y;
-                sel.width = sel.height = 0;
-            } else {
-                sel.width = x - sel.x;
-                sel.height = y - sel.y;
-                if ( sel.width <= 0 || sel.height <= 0 ) { // invalid, clear it all
-                    sel.x=sel.y=sel.width=sel.height = 0;
-                    mask = null;
-                    return false;
-                }
-                mask = Mat.zeros(mResultFrame.size(), mResultFrame.type());
-                mask.submat(sel).setTo(Scalar.all(255));
-            }
-            Log.w("touch", sel.toString());
-        }else{
-            touchNumbers = 0;
-            mask = null;
-        }
         return false;
     }
 
@@ -383,6 +353,37 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                         mMotionDetection.setmSecondTime(true);
                         mFirstTime = true;
                         Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    /* Called when the user clicks the mMask creation button */
+    public void showMaskCreationPopupMenu(final View view){
+        final CharSequence[] items = getResources().getStringArray(R.array.mask_creation_popup_list_values);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(CameraActivity.this);
+        builder.setTitle("What would you like to do?");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                switch(which) {
+                    case 0:
+                        mGOV.setVisibility(View.VISIBLE);
+                        mProcessButton.setVisibility(View.INVISIBLE);
+                        mSettingsButton.setVisibility(View.INVISIBLE);
+                        mViewModeButton.setVisibility(View.INVISIBLE);
+                        mMaskButton.setVisibility(View.INVISIBLE);
+                        //ArrayList<GesturePoint> gP = mGOV.getCurrentStroke();
+                        //createMask(gP.get(0).x,gP.get(0).y, gP.get(gP.size() - 1).x,gP.get(gP.size() - 1).y);
+                        Toast.makeText(getApplicationContext(), "Create your mask.", Toast.LENGTH_SHORT).show();
+                        break;
+                    case 1:
+                        mMask.release();
+                        mMask = null;
+                        Toast.makeText(getApplicationContext(), "Mask cleared.", Toast.LENGTH_SHORT).show();
                         break;
                 }
             }
@@ -455,6 +456,86 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
     }
 
+    private void createMask(Point pSX, Point pDX) {
+
+        Rect sel = new Rect(pSX, pDX);
+
+        mMask = Mat.zeros(mResultFrame.size(), mResultFrame.type());
+        mMask.submat(sel).setTo(Scalar.all(255));
+    }
+
+    @Override
+    public void onGestureStarted(GestureOverlayView overlay, MotionEvent event) {
+        int cols = mResultFrame.cols();
+        int rows = mResultFrame.rows();
+        //Second mapping formula...working better! :)
+        int width = (int)mDisplaySize.x;
+        int height = (int)mDisplaySize.y;
+        //Formula.
+        mPSX.x = ((int)event.getX()*cols)/width;
+        mPSX.y = ((int)event.getY()*rows)/height;
+    }
+
+    @Override
+    public void onGesture(GestureOverlayView overlay, MotionEvent event) {
+
+    }
+
+    @Override
+    public void onGestureEnded(GestureOverlayView overlay, MotionEvent event) {
+        int cols = mResultFrame.cols();
+        int rows = mResultFrame.rows();
+        //Second mapping formula...working better! :)
+        int width = (int)mDisplaySize.x;
+        int height = (int)mDisplaySize.y;
+        //Formula.
+        mPDX.x = ((int)event.getX()*cols)/width;
+        mPDX.y = ((int)event.getY()*rows)/height;
+
+        if (mPSX.x < 0 || mPSX.y <0|| mPSX.x >= cols || mPSX.y >= rows
+                || mPDX.x < 0 || mPDX.y <0|| mPDX.x >= cols || mPDX.y >= rows){
+            Toast.makeText(getApplicationContext(), "Mask creation failed! Please retry.", Toast.LENGTH_SHORT);
+
+            mGOV.setVisibility(View.INVISIBLE);
+            mProcessButton.setVisibility(View.VISIBLE);
+            mSettingsButton.setVisibility(View.VISIBLE);
+            mViewModeButton.setVisibility(View.VISIBLE);
+            mMaskButton.setVisibility(View.VISIBLE);
+
+
+        }else{
+            createMask(mPSX, mPDX);
+
+            mGOV.setVisibility(View.INVISIBLE);
+            mDiscardMaskButton.setVisibility(View.VISIBLE);
+            mConfirmMaskButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onGestureCancelled(GestureOverlayView overlay, MotionEvent event) {
+
+    }
+
+    public void discardMask(View view){
+        mMask.release();
+        mMask = null;
+        mDiscardMaskButton.setVisibility(View.INVISIBLE);
+        mConfirmMaskButton.setVisibility(View.INVISIBLE);
+        mProcessButton.setVisibility(View.VISIBLE);
+        mSettingsButton.setVisibility(View.VISIBLE);
+        mViewModeButton.setVisibility(View.VISIBLE);
+        mMaskButton.setVisibility(View.VISIBLE);
+    }
+
+    public void confirmMask(View view){
+        mDiscardMaskButton.setVisibility(View.INVISIBLE);
+        mConfirmMaskButton.setVisibility(View.INVISIBLE);
+        mProcessButton.setVisibility(View.VISIBLE);
+        mSettingsButton.setVisibility(View.VISIBLE);
+        mViewModeButton.setVisibility(View.VISIBLE);
+        mMaskButton.setVisibility(View.VISIBLE);
+    }
     public class ProcessingCountDownTimer extends CountDownTimer {
 
         public ProcessingCountDownTimer(long startTime, long interval){

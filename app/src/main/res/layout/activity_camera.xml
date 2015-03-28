@@ -14,7 +14,6 @@
         opencv:show_fps="true"
         android:id="@+id/java_surface_view" />
 
-
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -60,5 +59,54 @@
         android:layout_below="@+id/viewModeButton"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher"
+        style="?android:attr/borderlessButtonStyle"
+        android:contentDescription="@string/mask"
+        android:id="@+id/maskButton"
+        android:layout_above="@+id/viewModeButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="showMaskCreationPopupMenu"/>
+
+    <android.gesture.GestureOverlayView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/gestureOverlayView"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/processButton"
+        android:layout_alignEnd="@+id/processButton">
+
+    </android.gesture.GestureOverlayView>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher"
+        style="?android:attr/borderlessButtonStyle"
+        android:contentDescription="@string/confirm_mask"
+        android:id="@+id/confirmMaskButton"
+        android:visibility="invisible"
+        android:layout_alignParentBottom="true"
+        android:layout_alignLeft="@+id/emergencyButton"
+        android:layout_alignStart="@+id/emergencyButton"
+        android:onClick="confirmMask" />
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_launcher"
+        style="?android:attr/borderlessButtonStyle"
+        android:contentDescription="@string/discard_mask"
+        android:id="@+id/discardMaskButton"
+        android:visibility="invisible"
+        android:onClick="discardMask"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
