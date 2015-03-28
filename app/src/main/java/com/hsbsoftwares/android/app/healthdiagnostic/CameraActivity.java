@@ -185,6 +185,16 @@ import java.util.ArrayList;
                 mTimeOut = false;
                 mTimerHasStarted = false;
                 mLumArrayList.clear();
+
+                if(mProcessingModeOn){
+                    mSettingsButton.setVisibility(View.INVISIBLE);
+                    mViewModeButton.setVisibility(View.INVISIBLE);
+                    mMaskButton.setVisibility(View.INVISIBLE);
+                }else{
+                    mSettingsButton.setVisibility(View.VISIBLE);
+                    mViewModeButton.setVisibility(View.VISIBLE);
+                    mMaskButton.setVisibility(View.VISIBLE);
+                }
             }
         });
 
@@ -244,6 +254,9 @@ import java.util.ArrayList;
     {
         super.onResume();
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
+        mSettingsButton.setVisibility(View.VISIBLE);
+        mViewModeButton.setVisibility(View.VISIBLE);
+        mMaskButton.setVisibility(View.VISIBLE);
     }
 
     public void onDestroy() {
