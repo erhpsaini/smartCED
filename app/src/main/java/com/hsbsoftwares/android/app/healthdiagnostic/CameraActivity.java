@@ -6,6 +6,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.gesture.GestureOverlayView;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
@@ -110,7 +113,7 @@ import java.util.ArrayList;
     //List for storing supported Fps range
     //List <int[]> supportedPreviewFpsRange;
     //ArrayList to store white pixels of frames
-    ArrayList <Integer> mLumArrayList;
+    private ArrayList<Integer> mLumArrayList;
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -178,6 +181,10 @@ import java.util.ArrayList;
         mProcessButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 mProcessingModeOn = !mProcessingModeOn;
+                mMyCountDownTimer.cancel();
+                mTimeOut = false;
+                mTimerHasStarted = false;
+                mLumArrayList.clear();
             }
         });
 
@@ -224,6 +231,12 @@ import java.util.ArrayList;
         super.onPause();
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
+
+        mProcessingModeOn = false;
+        mMyCountDownTimer.cancel();
+        mTimeOut = false;
+        mTimerHasStarted = false;
+        mLumArrayList.clear();
     }
 
     @Override
@@ -274,33 +287,33 @@ import java.util.ArrayList;
         if(mMultipleViewModeOn) {
             return createMultipleFrameView(currentGrayFrame, mViewMode);
         }else {
+            if (mMask != null) {
+                Core.bitwise_and(currentGrayFrame, mMask, currentGrayFrame);
+            }
             if(mProcessingModeOn) {
                 if(mMotionDetectionMethod.equals("0")) {
                     mResultFrame = mMotionDetection.detectMotion(currentGrayFrame);
                 }else {
                     mResultFrame = mMotionDetection.detectMotion2(currentGrayFrame);
                 }
+
                 if(!mTimerHasStarted){
                     mTimerHasStarted = true;
                     mMyCountDownTimer.start();
-                    mIsCounting = true;
                 }
-                if(mIsCounting){
-                    mLumArrayList.add(mLumArrayList.size(), Core.countNonZero(mResultFrame));
-                }else{
-                    //Log.i(TAG, "Size of Lum list is " + mLumArrayList.size());
-                }
-                if(mTimeOut){
+
+                mLumArrayList.add(mLumArrayList.size(), Core.countNonZero(mResultFrame));
+
+                if(mTimeOut) {
+                    ArrayList<Integer> lumArrayList = new ArrayList<Integer>(mLumArrayList);
                     PathologyProcessingTask pathologyProcessingTask = new PathologyProcessingTask(mContext);
                     pathologyProcessingTask.setmEmergencyAlarmListener(this);
-                    pathologyProcessingTask.execute(mLumArrayList);
+                    pathologyProcessingTask.execute(lumArrayList);
                     mTimeOut = false;
+                    mLumArrayList.clear();
                 }
             }else {
                 mResultFrame = currentGrayFrame;
-                if (mMask != null) {
-                    Core.bitwise_and(mResultFrame, mMask, mResultFrame);
-                }
             }
             //releasing Mat to avoid memory leaks
             //currentGrayFrame.release();
@@ -524,6 +537,21 @@ import java.util.ArrayList;
 
     }
 
+    @Override
+    public void onEmergency() {
+        if(mEmergencyButton.getVisibility() == View.INVISIBLE){
+            mEmergencyButton.setVisibility(View.VISIBLE);
+        }
+
+        try {
+            Uri emergencyNotification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), emergencyNotification);
+            ringtone.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void discardMask(View view){
         if(mMask != null){
             mMask.release();
@@ -545,6 +573,7 @@ import java.util.ArrayList;
         mViewModeButton.setVisibility(View.VISIBLE);
         mMaskButton.setVisibility(View.VISIBLE);
     }
+
     public class ProcessingCountDownTimer extends CountDownTimer {
 
         public ProcessingCountDownTimer(long startTime, long interval){
@@ -554,23 +583,14 @@ import java.util.ArrayList;
         @Override
         public void onTick(long millisUntilFinished) {
             Log.i(TAG, "" + (int) (millisUntilFinished/1000));
-            //Toast.makeText(getApplicationContext(), "" + (int) (millisUntilFinished/1000), Toast.LENGTH_SHORT);
         }
 
         @Override
         public void onFinish() {
-            //mTimerHasStarted = false;
-            mIsCounting = false;
+            mTimerHasStarted = false;
             mTimeOut = true;
             Log.i(TAG, "Done with timer!");
-            //Toast.makeText(getApplicationContext(), "Done!", Toast.LENGTH_SHORT);
         }
     }
 
-    @Override
-    public void onEmergency() {
-        if(mEmergencyButton.getVisibility() == View.INVISIBLE){
-            mEmergencyButton.setVisibility(View.VISIBLE);
-        }
-    }
 }
