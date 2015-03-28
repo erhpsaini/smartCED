@@ -77,6 +77,9 @@ import java.util.ArrayList;
     //Timer constants
     private final long START_TIME = 10000;
     private final long INTERVAL = 1000;
+    //Mask constants
+    private static final int    CREATE_MASK = 0;
+    private static final int    CLEAR_MASK = 1;
 
     private static ProcessingCountDownTimer mMyCountDownTimer;
 
@@ -99,7 +102,7 @@ import java.util.ArrayList;
     private ImageButton mDiscardMaskButton;
     private ImageButton mConfirmMaskButton;
 
-    private GestureOverlayView mGOV;
+    private static GestureOverlayView mGOV;
 
     private Point mPSX, mPDX;
     //Rect sel = new Rect();
@@ -370,19 +373,23 @@ import java.util.ArrayList;
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
-                    case 0:
+                    case CREATE_MASK:
+                        if(mMask != null){
+                            mMask.release();
+                            mMask = null;
+                        }
                         mGOV.setVisibility(View.VISIBLE);
                         mProcessButton.setVisibility(View.INVISIBLE);
                         mSettingsButton.setVisibility(View.INVISIBLE);
                         mViewModeButton.setVisibility(View.INVISIBLE);
                         mMaskButton.setVisibility(View.INVISIBLE);
-                        //ArrayList<GesturePoint> gP = mGOV.getCurrentStroke();
-                        //createMask(gP.get(0).x,gP.get(0).y, gP.get(gP.size() - 1).x,gP.get(gP.size() - 1).y);
                         Toast.makeText(getApplicationContext(), "Create your mask.", Toast.LENGTH_SHORT).show();
                         break;
-                    case 1:
-                        mMask.release();
-                        mMask = null;
+                    case CLEAR_MASK:
+                        if(mMask != null){
+                            mMask.release();
+                            mMask = null;
+                        }
                         Toast.makeText(getApplicationContext(), "Mask cleared.", Toast.LENGTH_SHORT).show();
                         break;
                 }
@@ -518,8 +525,10 @@ import java.util.ArrayList;
     }
 
     public void discardMask(View view){
-        mMask.release();
-        mMask = null;
+        if(mMask != null){
+            mMask.release();
+            mMask = null;
+        }
         mDiscardMaskButton.setVisibility(View.INVISIBLE);
         mConfirmMaskButton.setVisibility(View.INVISIBLE);
         mProcessButton.setVisibility(View.VISIBLE);

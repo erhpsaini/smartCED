@@ -76,12 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/gestureOverlayView"
-        android:layout_alignParentBottom="true"
-        android:visibility="invisible"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/processButton"
-        android:layout_alignEnd="@+id/processButton">
+        android:visibility="gone">
 
     </android.gesture.GestureOverlayView>
 
