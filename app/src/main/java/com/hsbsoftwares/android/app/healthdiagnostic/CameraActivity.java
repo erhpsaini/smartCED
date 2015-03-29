@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.gesture.GestureOverlayView;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -353,6 +354,24 @@ import java.util.ArrayList;
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         Log.i(TAG, "onTouch event");
+        if(mIsSingleDiffDoubleDiffViewMode){
+            int center = mDisplaySize.x/2;
+
+            SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences.Editor editor = settings.edit();
+
+            if(event.getX() < center){
+                editor.putString("motion_detection_algorithm_list", "0");
+                editor.commit();
+                Toast.makeText(getApplicationContext(), "Single diff method selected!", Toast.LENGTH_SHORT).show();
+
+            }else {
+                editor.putString("motion_detection_algorithm_list", "1");
+                editor.commit();
+                Toast.makeText(getApplicationContext(), "Double diff method selected!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
         return false;
     }
 
