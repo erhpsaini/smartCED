@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.gesture.GestureOverlayView;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.preference.PreferenceManager;
@@ -229,7 +230,12 @@ import java.util.ArrayList;
         //Getting display size and saving it in a member variable.
         Display display = getWindowManager().getDefaultDisplay();
         mDisplaySize = new android.graphics.Point();
-        display.getSize(mDisplaySize);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            display.getSize(mDisplaySize);
+        } else {
+            mDisplaySize.x = display.getWidth();
+            mDisplaySize.y = display.getHeight();
+        }
 
         mMyCountDownTimer = new ProcessingCountDownTimer(START_TIME, INTERVAL);
 
