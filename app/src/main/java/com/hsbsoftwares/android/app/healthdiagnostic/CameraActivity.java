@@ -65,7 +65,7 @@ import java.util.ArrayList;
     private static boolean mFirstTime = true;
     //Booleans used with timer
     private static boolean mTimerHasStarted = false;
-    private static boolean mIsCounting = false;
+    private static boolean mIsSingleDiffDoubleDiffViewMode = false;
     private static boolean mTimeOut = false;
 
     private static int touchNumbers;
@@ -367,6 +367,8 @@ import java.util.ArrayList;
                     case RGBA_VIEW:
                         mProcessButton.setVisibility(View.VISIBLE);
                         mMultipleViewModeOn = false;
+                        mIsSingleDiffDoubleDiffViewMode = false;
+                        mMaskButton.setEnabled(true);
                         Toast.makeText(getApplicationContext(), "Multiple view mode off.", Toast.LENGTH_SHORT).show();
                         break;
                     case GRAY_SINGLE_DIFF_VIEW:
@@ -374,6 +376,8 @@ import java.util.ArrayList;
                         mMultipleViewModeOn = true;
                         mViewMode = GRAY_SINGLE_DIFF_VIEW;
                         mMotionDetection.setmFirstTime(true);
+                        mIsSingleDiffDoubleDiffViewMode = false;
+                        mMaskButton.setEnabled(false);
                         Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
                     case GRAY_DOUBLE_DIFF_VIEW:
@@ -382,6 +386,8 @@ import java.util.ArrayList;
                         mViewMode = GRAY_DOUBLE_DIFF_VIEW;
                         mMotionDetection.setmFirstTime(true);
                         mMotionDetection.setmSecondTime(true);
+                        mIsSingleDiffDoubleDiffViewMode = false;
+                        mMaskButton.setEnabled(false);
                         Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
                     case SINGLE_DOUBLE_DIFF_VIEW:
@@ -391,6 +397,8 @@ import java.util.ArrayList;
                         mMotionDetection.setmFirstTime(true);
                         mMotionDetection.setmSecondTime(true);
                         mFirstTime = true;
+                        mIsSingleDiffDoubleDiffViewMode = true;
+                        mMaskButton.setEnabled(false);
                         Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
                 }
