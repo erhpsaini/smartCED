@@ -10,7 +10,6 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.support.v4.app.NavUtils;
 import android.view.MenuItem;
 
 import java.util.List;
@@ -70,7 +69,8 @@ public class SettingsActivity extends PreferenceActivity {
             //
             // TODO: If Settings has multiple levels, Up should navigate up
             // that hierarchy.
-            NavUtils.navigateUpFromSameTask(this);
+            //NavUtils.navigateUpFromSameTask(this);
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
