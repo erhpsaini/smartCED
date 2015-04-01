@@ -52,7 +52,6 @@ import java.util.ArrayList;
             System.loadLibrary("native_lib");
         } catch (UnsatisfiedLinkError e) {
             Log.e(TAG, "Failed to load native_lib");
-
         }
     }
 
@@ -69,7 +68,10 @@ import java.util.ArrayList;
     private static boolean mTimerHasStarted = false;
     private static boolean mIsSingleDiffDoubleDiffViewMode = false;
     private static boolean mTimeOut = false;
-    private static boolean mIsPressed = false;
+
+    private static boolean mProcessButtonIsPressed = false;
+    private static boolean mIsMaskCreationModeOn = false;
+    private static boolean mIsMaskConfirmationHanging = false;
 
     private static int touchNumbers;
     private static final int BASE_FRAME_WIDTH = 640;
@@ -184,13 +186,13 @@ import java.util.ArrayList;
         mProcessButton = (ImageButton) findViewById(R.id.processButton);
         mProcessButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                if(mIsPressed){
+                if(mProcessButtonIsPressed){
                     mProcessButton.setImageResource(R.drawable.start_processing_btn_img);
                 }else{
                     mProcessButton.setImageResource(R.drawable.stop_processing_btn_img);
                 }
                 mProcessingModeOn = !mProcessingModeOn;
-                mIsPressed = !mIsPressed;
+                mProcessButtonIsPressed = !mProcessButtonIsPressed;
                 mMyCountDownTimer.cancel();
                 mTimeOut = false;
                 mTimerHasStarted = false;
@@ -267,10 +269,13 @@ import java.util.ArrayList;
             mOpenCvCameraView.disableView();
 
         mProcessingModeOn = false;
+        mProcessButtonIsPressed = false;
         mMyCountDownTimer.cancel();
         mTimeOut = false;
         mTimerHasStarted = false;
         mLumArrayList.clear();
+        mProcessButton.setImageResource(R.drawable.start_processing_btn_img);
+        mGOV.setVisibility(View.GONE);
     }
 
     @Override
@@ -278,9 +283,21 @@ import java.util.ArrayList;
     {
         super.onResume();
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
-        mSettingsButton.setVisibility(View.VISIBLE);
-        mViewModeButton.setVisibility(View.VISIBLE);
-        mMaskButton.setVisibility(View.VISIBLE);
+
+        if(mIsMaskConfirmationHanging){
+            mSettingsButton.setVisibility(View.INVISIBLE);
+            mViewModeButton.setVisibility(View.INVISIBLE);
+            mMaskButton.setVisibility(View.INVISIBLE);
+            mProcessButton.setVisibility(View.INVISIBLE);
+            mConfirmMaskButton.setVisibility(View.VISIBLE);
+            mDiscardMaskButton.setVisibility(View.VISIBLE);
+        }else if(mIsMaskCreationModeOn){
+            mGOV.setVisibility(View.VISIBLE);
+        }else {
+            mSettingsButton.setVisibility(View.VISIBLE);
+            mViewModeButton.setVisibility(View.VISIBLE);
+            mMaskButton.setVisibility(View.VISIBLE);
+        }
     }
 
     public void onDestroy() {
@@ -450,6 +467,7 @@ import java.util.ArrayList;
             public void onClick(DialogInterface dialog, int which) {
                 switch(which) {
                     case CREATE_MASK:
+                        mIsMaskCreationModeOn = true;
                         if(mMask != null){
                             mMask.release();
                             mMask = null;
@@ -566,6 +584,7 @@ import java.util.ArrayList;
 
     @Override
     public void onGestureEnded(GestureOverlayView overlay, MotionEvent event) {
+        mIsMaskCreationModeOn = false;
         int cols = mResultFrame.cols();
         int rows = mResultFrame.rows();
         //Second mapping formula...working better! :)
@@ -592,6 +611,7 @@ import java.util.ArrayList;
             mGOV.setVisibility(View.INVISIBLE);
             mDiscardMaskButton.setVisibility(View.VISIBLE);
             mConfirmMaskButton.setVisibility(View.VISIBLE);
+            mIsMaskConfirmationHanging = true;
         }
     }
 
@@ -621,6 +641,7 @@ import java.util.ArrayList;
         mSettingsButton.setVisibility(View.VISIBLE);
         mViewModeButton.setVisibility(View.VISIBLE);
         mMaskButton.setVisibility(View.VISIBLE);
+        mIsMaskConfirmationHanging = false;
     }
 
     public void confirmMask(View view){
@@ -630,6 +651,7 @@ import java.util.ArrayList;
         mSettingsButton.setVisibility(View.VISIBLE);
         mViewModeButton.setVisibility(View.VISIBLE);
         mMaskButton.setVisibility(View.VISIBLE);
+        mIsMaskConfirmationHanging = false;
     }
 
     public class ProcessingCountDownTimer extends CountDownTimer {
