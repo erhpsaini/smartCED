@@ -69,6 +69,7 @@ import java.util.ArrayList;
     private static boolean mTimerHasStarted = false;
     private static boolean mIsSingleDiffDoubleDiffViewMode = false;
     private static boolean mTimeOut = false;
+    private static boolean mIsPressed = false;
 
     private static int touchNumbers;
     private static final int BASE_FRAME_WIDTH = 640;
@@ -183,7 +184,13 @@ import java.util.ArrayList;
         mProcessButton = (ImageButton) findViewById(R.id.processButton);
         mProcessButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                if(mIsPressed){
+                    mProcessButton.setImageResource(R.drawable.start_processing_btn_img);
+                }else{
+                    mProcessButton.setImageResource(R.drawable.stop_processing_btn_img);
+                }
                 mProcessingModeOn = !mProcessingModeOn;
+                mIsPressed = !mIsPressed;
                 mMyCountDownTimer.cancel();
                 mTimeOut = false;
                 mTimerHasStarted = false;

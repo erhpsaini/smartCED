@@ -15,9 +15,12 @@
         android:id="@+id/java_surface_view" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/settings_btn_img"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
         android:id="@+id/settingsButton"
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/settings"
@@ -27,9 +30,12 @@
         android:onClick="openSettingsActivity" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/start_processing_btn_img"
+        android:scaleType="center"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/start_processing"
         android:id="@+id/processButton"
@@ -38,9 +44,12 @@
         android:layout_alignParentEnd="true"/>
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/multiple_view_mode_btn_img"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/view_mode"
         android:id="@+id/viewModeButton"
@@ -50,9 +59,12 @@
         android:onClick="showViewModePopupMenu" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/emergency_btn_img"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/emergency"
         android:id="@+id/emergencyButton"
@@ -61,9 +73,12 @@
         android:layout_alignParentEnd="true" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/mask_btn_img"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/mask"
         android:id="@+id/maskButton"
@@ -81,9 +96,12 @@
     </android.gesture.GestureOverlayView>
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/confirm_btn_img"
+        android:scaleType="center"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/confirm_mask"
         android:id="@+id/confirmMaskButton"
@@ -94,9 +112,12 @@
         android:onClick="confirmMask" />
 
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/cancel_btn_img"
+        android:scaleType="center"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/discard_mask"
         android:id="@+id/discardMaskButton"
