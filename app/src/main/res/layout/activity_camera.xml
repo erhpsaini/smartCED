@@ -108,11 +108,11 @@
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/confirm_mask"
         android:id="@+id/confirmMaskButton"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:onClick="confirmMask"
-        android:layout_below="@+id/viewModeButton"
-        android:layout_alignLeft="@+id/processButton"
-        android:layout_alignStart="@+id/processButton" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <ImageButton
         android:layout_width="55dp"
@@ -124,7 +124,7 @@
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/discard_mask"
         android:id="@+id/discardMaskButton"
-        android:visibility="invisible"
+        android:visibility="gone"
         android:onClick="discardMask"
         android:layout_alignParentBottom="true" />
 

@@ -248,10 +248,10 @@ import java.util.ArrayList;
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
 
         if(mIsMaskConfirmationHanging){
-            mSettingsButton.setVisibility(View.INVISIBLE);
-            mViewModeButton.setVisibility(View.INVISIBLE);
-            mMaskButton.setVisibility(View.INVISIBLE);
-            mProcessButton.setVisibility(View.INVISIBLE);
+            mSettingsButton.setVisibility(View.GONE);
+            mViewModeButton.setVisibility(View.GONE);
+            mMaskButton.setVisibility(View.GONE);
+            mProcessButton.setVisibility(View.GONE);
             mConfirmMaskButton.setVisibility(View.VISIBLE);
             mDiscardMaskButton.setVisibility(View.VISIBLE);
         }else if(mIsMaskCreationModeOn){
@@ -381,9 +381,9 @@ import java.util.ArrayList;
         mLumArrayList.clear();
 
         if(mProcessingModeOn){
-            mSettingsButton.setVisibility(View.INVISIBLE);
-            mViewModeButton.setVisibility(View.INVISIBLE);
-            mMaskButton.setVisibility(View.INVISIBLE);
+            mSettingsButton.setVisibility(View.GONE);
+            mViewModeButton.setVisibility(View.GONE);
+            mMaskButton.setVisibility(View.GONE);
         }else{
             mSettingsButton.setVisibility(View.VISIBLE);
             mViewModeButton.setVisibility(View.VISIBLE);
@@ -393,7 +393,7 @@ import java.util.ArrayList;
 
     public void onEmergencyButtonClicked(View view) {
         if(mEmergencyButton.getVisibility() == View.VISIBLE){
-            mEmergencyButton.setVisibility(View.INVISIBLE);
+            mEmergencyButton.setVisibility(View.GONE);
         }
         if(mEmergencyRingtone.isPlaying()){
             mEmergencyRingtone.stop();
@@ -417,7 +417,7 @@ import java.util.ArrayList;
                         Toast.makeText(getApplicationContext(), "Multiple view mode off.", Toast.LENGTH_SHORT).show();
                         break;
                     case GRAY_SINGLE_DIFF_VIEW:
-                        mProcessButton.setVisibility(View.INVISIBLE);
+                        mProcessButton.setVisibility(View.GONE);
                         mMultipleViewModeOn = true;
                         mViewMode = GRAY_SINGLE_DIFF_VIEW;
                         mMotionDetection.setmFirstTime(true);
@@ -426,7 +426,7 @@ import java.util.ArrayList;
                         Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
                     case GRAY_DOUBLE_DIFF_VIEW:
-                        mProcessButton.setVisibility(View.INVISIBLE);
+                        mProcessButton.setVisibility(View.GONE);
                         mMultipleViewModeOn = true;
                         mViewMode = GRAY_DOUBLE_DIFF_VIEW;
                         mMotionDetection.setmFirstTime(true);
@@ -436,7 +436,7 @@ import java.util.ArrayList;
                         Toast.makeText(getApplicationContext(), items[which] + " mode on.", Toast.LENGTH_SHORT).show();
                         break;
                     case SINGLE_DOUBLE_DIFF_VIEW:
-                        mProcessButton.setVisibility(View.INVISIBLE);
+                        mProcessButton.setVisibility(View.GONE);
                         mMultipleViewModeOn = true;
                         mViewMode = SINGLE_DOUBLE_DIFF_VIEW;
                         mMotionDetection.setmFirstTime(true);
@@ -469,10 +469,10 @@ import java.util.ArrayList;
                             mMask = null;
                         }
                         mGOV.setVisibility(View.VISIBLE);
-                        mProcessButton.setVisibility(View.INVISIBLE);
-                        mSettingsButton.setVisibility(View.INVISIBLE);
-                        mViewModeButton.setVisibility(View.INVISIBLE);
-                        mMaskButton.setVisibility(View.INVISIBLE);
+                        mProcessButton.setVisibility(View.GONE);
+                        mSettingsButton.setVisibility(View.GONE);
+                        mViewModeButton.setVisibility(View.GONE);
+                        mMaskButton.setVisibility(View.GONE);
                         Toast.makeText(getApplicationContext(), "Create your mask.", Toast.LENGTH_SHORT).show();
                         break;
                     case CLEAR_MASK:
@@ -594,7 +594,7 @@ import java.util.ArrayList;
                 || mPDX.x < 0 || mPDX.y <0|| mPDX.x >= cols || mPDX.y >= rows){
             Toast.makeText(getApplicationContext(), "Mask creation failed! Please retry.", Toast.LENGTH_SHORT);
 
-            mGOV.setVisibility(View.INVISIBLE);
+            mGOV.setVisibility(View.GONE);
             mProcessButton.setVisibility(View.VISIBLE);
             mSettingsButton.setVisibility(View.VISIBLE);
             mViewModeButton.setVisibility(View.VISIBLE);
@@ -604,7 +604,7 @@ import java.util.ArrayList;
         }else{
             createMask(mPSX, mPDX);
 
-            mGOV.setVisibility(View.INVISIBLE);
+            mGOV.setVisibility(View.GONE);
             mDiscardMaskButton.setVisibility(View.VISIBLE);
             mConfirmMaskButton.setVisibility(View.VISIBLE);
             mIsMaskConfirmationHanging = true;
@@ -618,7 +618,7 @@ import java.util.ArrayList;
 
     @Override
     public void onEmergency() {
-        if(mEmergencyButton.getVisibility() == View.INVISIBLE){
+        if(mEmergencyButton.getVisibility() == View.GONE){
             mEmergencyButton.setVisibility(View.VISIBLE);
         }
         if(!mEmergencyRingtone.isPlaying()){
@@ -631,8 +631,8 @@ import java.util.ArrayList;
             mMask.release();
             mMask = null;
         }
-        mDiscardMaskButton.setVisibility(View.INVISIBLE);
-        mConfirmMaskButton.setVisibility(View.INVISIBLE);
+        mDiscardMaskButton.setVisibility(View.GONE);
+        mConfirmMaskButton.setVisibility(View.GONE);
         mProcessButton.setVisibility(View.VISIBLE);
         mSettingsButton.setVisibility(View.VISIBLE);
         mViewModeButton.setVisibility(View.VISIBLE);
@@ -641,8 +641,8 @@ import java.util.ArrayList;
     }
 
     public void confirmMask(View view){
-        mDiscardMaskButton.setVisibility(View.INVISIBLE);
-        mConfirmMaskButton.setVisibility(View.INVISIBLE);
+        mDiscardMaskButton.setVisibility(View.GONE);
+        mConfirmMaskButton.setVisibility(View.GONE);
         mProcessButton.setVisibility(View.VISIBLE);
         mSettingsButton.setVisibility(View.VISIBLE);
         mViewModeButton.setVisibility(View.VISIBLE);
