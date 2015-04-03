@@ -268,6 +268,9 @@ import java.util.ArrayList;
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
 
+        if (mEmergencyRingtone.isPlaying())
+            mEmergencyRingtone.stop();
+
         mProcessingModeOn = false;
         mProcessButtonIsPressed = false;
         mMyCountDownTimer.cancel();
