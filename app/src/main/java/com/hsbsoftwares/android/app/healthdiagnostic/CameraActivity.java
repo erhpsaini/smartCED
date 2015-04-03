@@ -183,48 +183,8 @@ import java.util.ArrayList;
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
         mOpenCvCameraView.setCvCameraViewListener(this);
 
-        mProcessButton = (ImageButton) findViewById(R.id.processButton);
-        mProcessButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(mProcessButtonIsPressed){
-                    mProcessButton.setImageResource(R.drawable.start_processing_btn_img);
-                }else{
-                    mProcessButton.setImageResource(R.drawable.stop_processing_btn_img);
-                }
-                mProcessingModeOn = !mProcessingModeOn;
-                mProcessButtonIsPressed = !mProcessButtonIsPressed;
-                mMyCountDownTimer.cancel();
-                mTimeOut = false;
-                mTimerHasStarted = false;
-                mLumArrayList.clear();
-
-                if(mProcessingModeOn){
-                    mSettingsButton.setVisibility(View.INVISIBLE);
-                    mViewModeButton.setVisibility(View.INVISIBLE);
-                    mMaskButton.setVisibility(View.INVISIBLE);
-                }else{
-                    mSettingsButton.setVisibility(View.VISIBLE);
-                    mViewModeButton.setVisibility(View.VISIBLE);
-                    mMaskButton.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        mEmergencyButton = (ImageButton) findViewById(R.id.emergencyButton);
-        if(mEmergencyButton.getVisibility() == View.VISIBLE){
-            mEmergencyButton.setVisibility(View.INVISIBLE);
-        }
-        mEmergencyButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                if(mEmergencyButton.getVisibility() == View.VISIBLE){
-                    mEmergencyButton.setVisibility(View.INVISIBLE);
-                }
-                if(mEmergencyRingtone.isPlaying()){
-                    mEmergencyRingtone.stop();
-                }
-            }
-        });
-
+        mProcessButton          = (ImageButton) findViewById(R.id.processButton);
+        mEmergencyButton        = (ImageButton) findViewById(R.id.emergencyButton);
         mSettingsButton         = (ImageButton) findViewById(R.id.settingsButton);
         mViewModeButton         = (ImageButton) findViewById(R.id.viewModeButton);
         mMaskButton             = (ImageButton) findViewById(R.id.maskButton);
@@ -405,6 +365,39 @@ import java.util.ArrayList;
     /* Called when the user clicks the Settings button */
     public void openSettingsActivity(View view) {
         startActivity(new Intent(this, SettingsActivity.class));
+    }
+
+    public void onProcessButtonClicked(View view) {
+        if(mProcessButtonIsPressed){
+            mProcessButton.setImageResource(R.drawable.start_processing_btn_img);
+        }else{
+            mProcessButton.setImageResource(R.drawable.stop_processing_btn_img);
+        }
+        mProcessingModeOn = !mProcessingModeOn;
+        mProcessButtonIsPressed = !mProcessButtonIsPressed;
+        mMyCountDownTimer.cancel();
+        mTimeOut = false;
+        mTimerHasStarted = false;
+        mLumArrayList.clear();
+
+        if(mProcessingModeOn){
+            mSettingsButton.setVisibility(View.INVISIBLE);
+            mViewModeButton.setVisibility(View.INVISIBLE);
+            mMaskButton.setVisibility(View.INVISIBLE);
+        }else{
+            mSettingsButton.setVisibility(View.VISIBLE);
+            mViewModeButton.setVisibility(View.VISIBLE);
+            mMaskButton.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public void onEmergencyButtonClicked(View view) {
+        if(mEmergencyButton.getVisibility() == View.VISIBLE){
+            mEmergencyButton.setVisibility(View.INVISIBLE);
+        }
+        if(mEmergencyRingtone.isPlaying()){
+            mEmergencyRingtone.stop();
+        }
     }
 
     /* Called when the user clicks the view mode button */

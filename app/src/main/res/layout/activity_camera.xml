@@ -37,11 +37,12 @@
         android:adjustViewBounds="true"
         android:padding="10dp"
         style="?android:attr/borderlessButtonStyle"
-        android:contentDescription="@string/start_processing"
+        android:contentDescription="@string/processing_switch"
         android:id="@+id/processButton"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true"
+        android:onClick="onProcessButtonClicked"/>
 
     <ImageButton
         android:layout_width="55dp"
@@ -69,7 +70,9 @@
         android:id="@+id/emergencyButton"
         android:layout_below="@+id/viewModeButton"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"
+        android:onClick="onEmergencyButtonClicked"/>
 
     <ImageButton
         android:layout_width="55dp"
