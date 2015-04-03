@@ -108,10 +108,10 @@
         android:contentDescription="@string/confirm_mask"
         android:id="@+id/confirmMaskButton"
         android:visibility="invisible"
-        android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/emergencyButton"
-        android:layout_alignStart="@+id/emergencyButton"
-        android:onClick="confirmMask" />
+        android:onClick="confirmMask"
+        android:layout_below="@+id/viewModeButton"
+        android:layout_alignLeft="@+id/processButton"
+        android:layout_alignStart="@+id/processButton" />
 
     <ImageButton
         android:layout_width="55dp"
