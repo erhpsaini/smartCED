@@ -69,11 +69,13 @@
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/emergency"
         android:id="@+id/emergencyButton"
-        android:layout_below="@+id/viewModeButton"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:visibility="gone"
-        android:onClick="onEmergencyButtonClicked"/>
+        android:onClick="onEmergencyButtonClicked"
+        android:layout_alignTop="@+id/settingsButton"
+        android:layout_alignRight="@+id/processButton"
+        android:layout_alignEnd="@+id/processButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"/>
 
     <ImageButton
         android:layout_width="55dp"
