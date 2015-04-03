@@ -80,7 +80,7 @@
     <ImageButton
         android:layout_width="55dp"
         android:layout_height="55dp"
-        android:src="@drawable/mask_btn_img"
+        android:src="@drawable/mask_button_selector"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
         android:padding="10dp"
