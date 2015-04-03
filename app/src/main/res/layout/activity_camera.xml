@@ -59,12 +59,11 @@
         android:onClick="showViewModePopupMenu" />
 
     <ImageButton
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:src="@drawable/emergency_btn_img"
-        android:scaleType="fitCenter"
+        android:scaleType="center"
         android:adjustViewBounds="true"
-        android:padding="10dp"
         style="?android:attr/borderlessButtonStyle"
         android:contentDescription="@string/emergency"
         android:id="@+id/emergencyButton"
