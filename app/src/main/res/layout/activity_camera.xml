@@ -5,7 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:id="@+id/activity_camera"
-    android:touchscreenBlocksFocus="false">
+    android:touchscreenBlocksFocus="false"
+    android:animateLayoutChanges="true">
 
     <com.hsbsoftwares.android.app.healthdiagnostic.CameraView
         android:layout_width="match_parent"
