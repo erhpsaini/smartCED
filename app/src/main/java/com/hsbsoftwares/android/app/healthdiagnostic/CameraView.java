@@ -22,15 +22,19 @@ public class CameraView extends JavaCameraView {
     //The surface holder
     private final SurfaceHolder mSurfaceHolder;
 
+    //Constructor
     public CameraView(Context context, AttributeSet attrs) {
         super(context, attrs);
         mSurfaceHolder = getHolder();
     }
 
+    //Some of the below methods are not used at the moment but may be useful in the future so i am leaving them
+    //To get resolution list
     public List<Camera.Size> getResolutionList() {
         return mCamera.getParameters().getSupportedPreviewSizes();
     }
 
+    //To set resolution
     public void setResolution(Camera.Size resolution) {
         disconnectCamera();
         mMaxHeight = resolution.height;
@@ -38,12 +42,13 @@ public class CameraView extends JavaCameraView {
         connectCamera(getWidth(), getHeight());
     }
 
+    //To get resolution
     public Camera.Size getResolution() {
         return mCamera.getParameters().getPreviewSize();
     }
 
     /*
-     *Method to set the base resolution to work with to have good performances.
+     *Method to set the base resolution to work with to have good performances
      */
     public void setBaseResolution() {
         Camera.Parameters params = mCamera.getParameters();
@@ -69,14 +74,17 @@ public class CameraView extends JavaCameraView {
         //mCamera.setParameters(params);
     }
 
+    //To get supported fps
     public  List<int[]>  getSupportedPreviewFpsRange (){
         return mCamera.getParameters().getSupportedPreviewFpsRange();
     }
 
+    //To set fps range
     public void setSupportedPreviewFpsRange (int min, int max){
         mCamera.getParameters().setPreviewFpsRange(min, max);
     }
 
+    //To get surface holder
     public SurfaceHolder getmSurfaceHolder() {
         return mSurfaceHolder;
     }
