@@ -319,15 +319,15 @@ import java.util.ArrayList;
                     mMyCountDownTimer.start();
                 }
 
-                mLumArrayList.add(mLumArrayList.size(), Core.countNonZero(mResultFrame));
+                mLumArrayList.add(Core.countNonZero(mResultFrame));
 
                 if(mTimeOut) {
                     ArrayList<Integer> lumArrayList = new ArrayList<Integer>(mLumArrayList);
+                    mLumArrayList.clear();
                     PathologyProcessingTask pathologyProcessingTask = new PathologyProcessingTask(mContext);
                     pathologyProcessingTask.setmEmergencyAlarmListener(this);
                     pathologyProcessingTask.execute(lumArrayList);
                     mTimeOut = false;
-                    mLumArrayList.clear();
                 }
             }else {
                 mResultFrame = currentGrayFrame;
