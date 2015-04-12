@@ -47,6 +47,7 @@ import java.util.ArrayList;
 
     private static final String TAG = "CameraActivity";
 
+    //Static part of the activity/app which loads native (C) code
     static {
         try {
             System.loadLibrary("native_lib");
@@ -55,28 +56,32 @@ import java.util.ArrayList;
         }
     }
 
+    //App's context
     private static Context mContext;
+
     //Display size
     private static android.graphics.Point mDisplaySize;
 
-    //private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
-
+    //Booleans used for app's state
     private static boolean mProcessingModeOn = false;
     private static boolean mMultipleViewModeOn = false;
-    private static boolean mFirstTime = true;
-    //Booleans used with timer
-    private static boolean mTimerHasStarted = false;
-    private static boolean mIsSingleDiffDoubleDiffViewMode = false;
-    private static boolean mTimeOut = false;
-
     private static boolean mProcessButtonIsPressed = false;
     private static boolean mIsMaskCreationModeOn = false;
     private static boolean mIsMaskConfirmationHanging = false;
+    //Boolean used for initial processing setup
+    private static boolean mFirstTime = true;
+    //Booleans used with timer
+    private static boolean mTimerHasStarted = false;
+    private static boolean mTimeOut = false;
+    //Boolean used to activate/deactivate onTouch method's functionality
+    private static boolean mIsSingleDiffDoubleDiffViewMode = false;
 
-    private static int touchNumbers;
+    //Base frame size
     private static final int BASE_FRAME_WIDTH = 640;
     private static final int BASE_FRAME_HEIGHT = 480;
+    //Base frame type
     private static final int BASE_FRAME_TYPE = CvType.CV_8U;
+    //Constants used with multiple view mode functionality
     private static final int RGBA_VIEW = 0;
     private static final int GRAY_SINGLE_DIFF_VIEW = 1;
     private static final int GRAY_DOUBLE_DIFF_VIEW = 2;
@@ -88,19 +93,27 @@ import java.util.ArrayList;
     private static final int    CREATE_MASK = 0;
     private static final int    CLEAR_MASK = 1;
 
+    //Timer used for collecting frames from camera for 10 seconds
     private static ProcessingCountDownTimer mMyCountDownTimer;
 
+    //View mode value
     private static int mViewMode = RGBA_VIEW;
 
+    //Camera and camera view: openCV
     private CameraView mOpenCvCameraView;
 
+    //Mat for saving result frame
     private Mat mResultFrame;
+    //Mat used in mask creation functionality
     private Mat mMask;
 
+    //Motion detection class
     private static MotionDetection mMotionDetection;
 
+    //Motion detection method, default is Single Diff
     private static String mMotionDetectionMethod = SettingsActivity.getDefaultMotionDetectionMethod();
 
+    //Activity buttons
     private ImageButton mProcessButton;
     private ImageButton mEmergencyButton;
     private ImageButton mSettingsButton;
@@ -109,18 +122,20 @@ import java.util.ArrayList;
     private ImageButton mDiscardMaskButton;
     private ImageButton mConfirmMaskButton;
 
+    //Particular view used with mask creation functionality
     private static GestureOverlayView mGOV;
 
+    //Used for saving touch coordinates
     private Point mPSX, mPDX;
-    //Rect sel = new Rect();
 
-    //List for storing supported Fps range
-    //List <int[]> supportedPreviewFpsRange;
     //ArrayList to store white pixels of frames
     private ArrayList<Integer> mLumArrayList;
 
+    //For emergency sound alarm
     private static Ringtone mEmergencyRingtone;
 
+    //Basic implementation of LoaderCallbackInterface
+    //LoaderCallbackInterface: Interface for callback object in case of asynchronous initialization of OpenCV
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -130,17 +145,6 @@ import java.util.ArrayList;
                     Log.i(TAG, "OpenCV loaded successfully");
                     mOpenCvCameraView.enableView();
                     mOpenCvCameraView.setOnTouchListener(CameraActivity.this);
-
-                    //Getting supported Fps range
-                    /*supportedPreviewFpsRange = mOpenCvCameraView.getSupportedPreviewFpsRange();
-                    Log.i(TAG, "FpsRange size: " + supportedPreviewFpsRange.size());
-                    for (ListIterator<int[]> iter = supportedPreviewFpsRange.listIterator(); iter.hasNext();) {
-                        int[] element = iter.next();
-                        Log.i(TAG, "MIN FPS: " + element[0] + " MAX FPS: " + element[1]);
-                    }
-                    //Setting the maximum range supported which is in the last position of the list
-                    mOpenCvCameraView.setSupportedPreviewFpsRange(supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[0],
-                            supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[1]);*/
                 } break;
                 default:
                 {
@@ -152,8 +156,7 @@ import java.util.ArrayList;
 
     public CameraActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
-        //paint.setColor(Color.GREEN);
-        //paint.setStyle(Paint.Style.STROKE);
+
         mLumArrayList = new ArrayList<Integer>();
         mPSX = new Point();
         mPDX = new Point();
@@ -166,8 +169,10 @@ import java.util.ArrayList;
 
         super.onCreate(savedInstanceState);
 
+        //Getting app's context for the future use
         mContext = getApplicationContext();
 
+        //Setting Keep screen on when app is active
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // Set full screen view
@@ -177,6 +182,7 @@ import java.util.ArrayList;
 
         setContentView(R.layout.activity_camera);
 
+        //Camera and camera view setup
         mOpenCvCameraView = (CameraView) findViewById(R.id.java_surface_view);
         //The base frame for us is 640x480 for processing performances reasons.
         mOpenCvCameraView.setMaxFrameSize(BASE_FRAME_WIDTH, BASE_FRAME_HEIGHT);
@@ -194,9 +200,6 @@ import java.util.ArrayList;
         mGOV = (GestureOverlayView)findViewById(R.id.gestureOverlayView);
         mGOV.addOnGestureListener(CameraActivity.this);
 
-        //ImageView myImage = (ImageView) findViewById(R.id.imageView);
-        //myImage.setAlpha((float) 0.0);
-
         //Getting display size and saving it in a member variable.
         Display display = getWindowManager().getDefaultDisplay();
         mDisplaySize = new android.graphics.Point();
@@ -209,28 +212,28 @@ import java.util.ArrayList;
 
         mMyCountDownTimer = new ProcessingCountDownTimer(START_TIME, INTERVAL);
 
+        //Getting default alarm ringtone to be played when emergency occur
         try {
             mEmergencyRingtone = RingtoneManager.getRingtone(getApplicationContext(), RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        //ArrayList<View> views = new ArrayList<View>();
-        //views.add(findViewById(R.id.mProcessButton));
-        //views.add(findViewById(R.id.settingsButton));
-        //mOpenCvCameraView.addTouchables(views);
     }
 
     @Override
     public void onPause()
     {
         super.onPause();
+
+        //Disabling camera view and releasing camera (important!!)
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
 
+        //Stop ringtone if app goes on pause
         if (mEmergencyRingtone.isPlaying())
             mEmergencyRingtone.stop();
 
+        //Doing some stuff to have consistent behaviour of the app
         mProcessingModeOn = false;
         mProcessButtonIsPressed = false;
         mMyCountDownTimer.cancel();
@@ -245,8 +248,10 @@ import java.util.ArrayList;
     public void onResume()
     {
         super.onResume();
+        //Asynchronous initialization of OpenCV
         OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_2_4_3, this, mLoaderCallback);
 
+        //Resuming consistent state
         if(mIsMaskConfirmationHanging){
             mSettingsButton.setVisibility(View.GONE);
             mViewModeButton.setVisibility(View.GONE);
@@ -265,21 +270,14 @@ import java.util.ArrayList;
 
     public void onDestroy() {
         super.onDestroy();
+
+        //Disabling camera view and releasing camera (important!!)
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
     }
 
     public void onCameraViewStarted(int width, int height) {
-        //Getting supported Fps range
-        /*supportedPreviewFpsRange = mOpenCvCameraView.getSupportedPreviewFpsRange();
-        Log.i(TAG, "FpsRange size: " + supportedPreviewFpsRange.size());
-        for (ListIterator<int[]> iter = supportedPreviewFpsRange.listIterator(); iter.hasNext();) {
-            int[] element = iter.next();
-            Log.i(TAG, "MIN FPS: " + element[0] + " MAX FPS: " + element[1]);
-        }
-        //Setting the maximum range supported which is in the last position of the list
-        mOpenCvCameraView.setSupportedPreviewFpsRange(supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[0],
-                supportedPreviewFpsRange.get(supportedPreviewFpsRange.size()-1)[1]);*/
+        //Getting motion detection method to be used from shared preferences
         mMotionDetectionMethod = PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
                 .getString("motion_detection_algorithm_list", mMotionDetectionMethod);
         Log.i(TAG, "Motion detection method: " + mMotionDetectionMethod);
@@ -293,47 +291,54 @@ import java.util.ArrayList;
 
     public void onCameraViewStopped() {
         Log.i(TAG, "Called onCameraViewStopped");
-        //Avoiding memory leaks.
+        //Avoiding memory leaks, important for openCV
         mMotionDetection.releaseMemory();
     }
 
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         //Log.i(TAG, "Resolution using cols() & rows()" + String.valueOf(inputFrame.rgba().cols() + "x" + inputFrame.rgba().rows()));
         //Log.i(TAG, "Resolution using width() & height()" + String.valueOf(inputFrame.rgba().width() + "x" + inputFrame.rgba().height()));
+        //Converting frame in to gray scale
         Mat currentGrayFrame = inputFrame.gray();
         if(mMultipleViewModeOn) {
+            //If mMultipleViewModeOn show multiple view
             return createMultipleFrameView(currentGrayFrame, mViewMode);
         }else {
+            //If mask is created apply it
             if (mMask != null) {
                 Core.bitwise_and(currentGrayFrame, mMask, currentGrayFrame);
             }
-            if(mProcessingModeOn) {
+            if(mProcessingModeOn) {//If mProcessingModeOn so go on and process
+                //Detect motion with the selected algorithm
                 if(mMotionDetectionMethod.equals("0")) {
                     mResultFrame = mMotionDetection.detectMotion(currentGrayFrame);
                 }else {
                     mResultFrame = mMotionDetection.detectMotion2(currentGrayFrame);
                 }
 
+                //Start timer every 10 seconds to collect frames
                 if(!mTimerHasStarted){
                     mTimerHasStarted = true;
                     mMyCountDownTimer.start();
                 }
 
+                //Collect frames for 10 seconds
                 mLumArrayList.add(Core.countNonZero(mResultFrame));
 
                 if(mTimeOut) {
                     ArrayList<Integer> lumArrayList = new ArrayList<Integer>(mLumArrayList);
+                    //After the timeout reset the list
                     mLumArrayList.clear();
+                    //Prepare and launch task avery 10 seconds
                     PathologyProcessingTask pathologyProcessingTask = new PathologyProcessingTask(mContext);
                     pathologyProcessingTask.setmEmergencyAlarmListener(this);
                     pathologyProcessingTask.execute(lumArrayList);
                     mTimeOut = false;
                 }
-            }else {
+            }else {//If processing mode is off simply show gray scale frames
                 mResultFrame = currentGrayFrame;
             }
-            //releasing Mat to avoid memory leaks
-            //currentGrayFrame.release();
+
             return mResultFrame;
         }
     }
@@ -341,6 +346,7 @@ import java.util.ArrayList;
     @Override
     public boolean onTouch(View v, MotionEvent event) {
         Log.i(TAG, "onTouch event");
+        //If mIsSingleDiffDoubleDiffViewMode is true activate touch for motion detection algorithm selection
         if(mIsSingleDiffDoubleDiffViewMode){
             int center = mDisplaySize.x/2;
 
@@ -368,11 +374,14 @@ import java.util.ArrayList;
     }
 
     public void onProcessButtonClicked(View view) {
+        //Changing image resource on button clicked
         if(mProcessButtonIsPressed){
             mProcessButton.setImageResource(R.drawable.start_processing_btn_img);
         }else{
             mProcessButton.setImageResource(R.drawable.stop_processing_btn_img);
         }
+
+        //Some stuff to have a consistent app state
         mProcessingModeOn = !mProcessingModeOn;
         mProcessButtonIsPressed = !mProcessButtonIsPressed;
         mMyCountDownTimer.cancel();
@@ -392,9 +401,11 @@ import java.util.ArrayList;
     }
 
     public void onEmergencyButtonClicked(View view) {
+        //When the button is clicked it goes off
         if(mEmergencyButton.getVisibility() == View.VISIBLE){
             mEmergencyButton.setVisibility(View.GONE);
         }
+        //and ringtone playing is stopped
         if(mEmergencyRingtone.isPlaying()){
             mEmergencyRingtone.stop();
         }
@@ -465,6 +476,7 @@ import java.util.ArrayList;
                     case CREATE_MASK:
                         mIsMaskCreationModeOn = true;
                         if(mMask != null){
+                            //Removing mask
                             mMask.release();
                             mMask = null;
                         }
@@ -477,6 +489,7 @@ import java.util.ArrayList;
                         break;
                     case CLEAR_MASK:
                         if(mMask != null){
+                            //Removing mask
                             mMask.release();
                             mMask = null;
                         }
@@ -493,17 +506,23 @@ import java.util.ArrayList;
         return mContext;
     }
 
+    //Method for creating multiple view
     private static Mat createMultipleFrameView(final Mat currentGrayFrame, final int viewMode){
+        //Making a copy of the frame
         Mat currentGrayFrameCopy = new Mat(currentGrayFrame.size(), currentGrayFrame.type());
         currentGrayFrame.copyTo(currentGrayFrameCopy);
+        //Temporary frames
         Mat processedFrameSingleDiff;
         Mat processedFrameDoubleDiff;
+        //Temporary right and left sub frames
         Mat subSx = currentGrayFrame.submat(0, currentGrayFrame.rows(), 0, currentGrayFrame.cols() / 2);
         Mat subDx = currentGrayFrame.submat(0, currentGrayFrame.rows(), currentGrayFrame.cols()/2, currentGrayFrame.cols());
 
+        //Getting sub frames size
         Size subSxSize = subSx.size();
         Size subDxSize = subDx.size();
 
+        //Resizing currentGrayFrame to adapt the left part of the original frame
         Imgproc.resize(currentGrayFrame, subSx, subSxSize);
 
         switch(viewMode) {
@@ -513,8 +532,11 @@ import java.util.ArrayList;
                 currentGrayFrameCopy.release();
                 break;
             case GRAY_SINGLE_DIFF_VIEW:
+                //Processing the frame
                 processedFrameSingleDiff = mMotionDetection.detectMotion(currentGrayFrameCopy);
+                //and resizing it to adapt the right part of the original frame
                 Imgproc.resize(processedFrameSingleDiff, subDx, subDxSize);
+                //Drawing rectangle on the right side
                 Core.rectangle(subDx, new Point(1, 1), new Point(subDxSize.width - 2, subDxSize.height - 2), new Scalar(255, 0, 0, 255), 2);
                 processedFrameSingleDiff.release();
                 subSx.release();
@@ -522,8 +544,11 @@ import java.util.ArrayList;
                 currentGrayFrameCopy.release();
                 break;
             case GRAY_DOUBLE_DIFF_VIEW:
+                //Processing the frame
                 processedFrameDoubleDiff = mMotionDetection.detectMotion2(currentGrayFrameCopy);
+                //and resizing it to adapt the right part of the original frame
                 Imgproc.resize(processedFrameDoubleDiff, subDx, subDxSize);
+                //Drawing rectangle on the right side
                 Core.rectangle(subDx, new Point(1, 1), new Point(subDxSize.width - 2, subDxSize.height - 2), new Scalar(255, 0, 0, 255), 2);
                 processedFrameDoubleDiff.release();
                 subSx.release();
@@ -531,14 +556,19 @@ import java.util.ArrayList;
                 currentGrayFrameCopy.release();
                 break;
             case SINGLE_DOUBLE_DIFF_VIEW:
+                //Processing the frame
                 processedFrameSingleDiff = mMotionDetection.detectMotion(currentGrayFrameCopy);
+                //and resizing it to adapt the left part of the original frame
                 Imgproc.resize(processedFrameSingleDiff, subSx, subSxSize);
                 if(mFirstTime) {
                     mMotionDetection.setmFirstTime(true);
                     mFirstTime = false;
                 }
+                //Processing the frame
                 processedFrameDoubleDiff = mMotionDetection.detectMotion2(currentGrayFrameCopy);
+                //and resizing it to adapt the right part of the original frame
                 Imgproc.resize(processedFrameDoubleDiff, subDx, subDx.size());
+                //Drawing rectangle on the left and right side
                 Core.rectangle(subSx, new Point(1, 1), new Point(subSxSize.width - 2, subSxSize.height - 2), new Scalar(255, 0, 0, 255), 2);
                 Core.rectangle(subDx, new Point(1, 1), new Point(subDxSize.width - 2, subDxSize.height - 2), new Scalar(255, 0, 0, 255), 2);
                 processedFrameSingleDiff.release();
@@ -554,9 +584,10 @@ import java.util.ArrayList;
     }
 
     private void createMask(Point pSX, Point pDX) {
-
+        //User selected rectangle zone
         Rect sel = new Rect(pSX, pDX);
 
+        //Creating mask
         mMask = Mat.zeros(mResultFrame.size(), mResultFrame.type());
         mMask.submat(sel).setTo(Scalar.all(255));
     }
@@ -568,7 +599,7 @@ import java.util.ArrayList;
         //Second mapping formula...working better! :)
         int width = (int)mDisplaySize.x;
         int height = (int)mDisplaySize.y;
-        //Formula.
+        //Formula:
         mPSX.x = ((int)event.getX()*cols)/width;
         mPSX.y = ((int)event.getY()*rows)/height;
     }
@@ -586,10 +617,11 @@ import java.util.ArrayList;
         //Second mapping formula...working better! :)
         int width = (int)mDisplaySize.x;
         int height = (int)mDisplaySize.y;
-        //Formula.
+        //Formula:
         mPDX.x = ((int)event.getX()*cols)/width;
         mPDX.y = ((int)event.getY()*rows)/height;
 
+        //Checking if the two points can be used to have an rectangle on the frame
         if (mPSX.x < 0 || mPSX.y <0|| mPSX.x >= cols || mPSX.y >= rows
                 || mPDX.x < 0 || mPDX.y <0|| mPDX.x >= cols || mPDX.y >= rows){
             Toast.makeText(getApplicationContext(), "Mask creation failed! Please retry.", Toast.LENGTH_SHORT);
@@ -602,6 +634,7 @@ import java.util.ArrayList;
 
 
         }else{
+            //If everything is ok then create the mask
             createMask(mPSX, mPDX);
 
             mGOV.setVisibility(View.GONE);
@@ -618,9 +651,11 @@ import java.util.ArrayList;
 
     @Override
     public void onEmergency() {
+        //When emergency occur show the emergency button
         if(mEmergencyButton.getVisibility() == View.GONE){
             mEmergencyButton.setVisibility(View.VISIBLE);
         }
+        //and play the sound
         if(!mEmergencyRingtone.isPlaying()){
             mEmergencyRingtone.play();
         }
@@ -628,6 +663,7 @@ import java.util.ArrayList;
 
     public void discardMask(View view){
         if(mMask != null){
+            //Removing mask
             mMask.release();
             mMask = null;
         }
