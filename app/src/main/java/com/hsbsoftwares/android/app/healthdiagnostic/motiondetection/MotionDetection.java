@@ -21,18 +21,23 @@ public class MotionDetection {
     //This class must be singleton to avoid memory leaks because it is used by openCV JavaCameraView's callbacks.
     private static MotionDetection instance = null;
 
+    //Some booleans used for initialising motion detection algorithms
     private static boolean  mFirstTime = true;
     private static boolean  mSecondTime = true;
 
+    //Some constants used in the class
     private static final int WHITE_PIXEL = 255;
 
+    //Mat objects for saving frames during processing
     private static Mat  mPreviousFrame;
     private static Mat  mPreviousFrame2;
     private static Mat  mLastThirdFrame;
     private static Mat  mResultFrame;
 
+    //Initialising threshold with default value
     private static int mThreshold = SettingsActivity.getDefaultThresholdValue();
 
+    //Constructor
     private MotionDetection(int frameWidth, int frameHeight, int frameType){
         mPreviousFrame = new Mat(frameWidth, frameHeight, frameType);
         mPreviousFrame2 = new Mat(frameWidth, frameHeight, frameType);
@@ -40,6 +45,7 @@ public class MotionDetection {
         mResultFrame = new Mat(frameWidth, frameHeight, frameType);
     }
 
+    //Method used to get singleton instance of the class
     public static MotionDetection getInstance(int frameWidth, int frameHeight, int frameType){
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(CameraActivity.getAppContext());
         mThreshold = prefs.getInt("motion_detection_threshold_picker", SettingsActivity.getDefaultThresholdValue());
@@ -56,6 +62,7 @@ public class MotionDetection {
         return instance;
     }
 
+    //Setters
     public static void setmFirstTime(boolean mFirstTime) {
         MotionDetection.mFirstTime = mFirstTime;
     }
@@ -132,7 +139,7 @@ public class MotionDetection {
         Core.bitwise_and(differenceFrame, mResultFrame, mResultFrame);
         //Imgproc.threshold(mResultRgba, mResultRgba, 60, 255, Imgproc.THRESH_BINARY); // Doing something different??
 
-        ////saving the previous frame as last of three recent frames.
+        //saving the previous frame as last of three recent frames.
         mPreviousFrame2.copyTo(mLastThirdFrame);
         //saving the current frame as previous.
         currentGrayFrame.copyTo(mPreviousFrame2);
@@ -143,6 +150,7 @@ public class MotionDetection {
         return mResultFrame;
     }
 
+    //Method to release memory, it is important when working with openCV!
     public void releaseMemory(){
         mPreviousFrame.release();
         mPreviousFrame2.release();
