@@ -40,9 +40,7 @@ import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 
-/**
- * Created by Harpreet Singh Bola on 24/02/2015.
- */
+
     public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2, View.OnTouchListener, IEmergencyAlarmListener, GestureOverlayView.OnGestureListener {
 
     private static final String TAG = "CameraActivity";

@@ -10,9 +10,7 @@ import org.opencv.android.JavaCameraView;
 
 import java.util.List;
 
-/**
- * Created by Harpreet Singh Bola on 24/02/2015.
- */
+
 public class CameraView extends JavaCameraView {
 
     private static final String TAG = "CameraView";
