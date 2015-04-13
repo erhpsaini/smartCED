@@ -8,14 +8,13 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.NumberPicker;
 
-/**
- * Created by Harpreet Singh Bola on 03/03/2015.
- */
+//Number picker used to select threshold value
 public class NumberPickerPreference extends DialogPreference {
 
     NumberPicker picker;
     Integer initialValue;
 
+    //Constructor
     public NumberPickerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -23,7 +22,6 @@ public class NumberPickerPreference extends DialogPreference {
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
         this.picker = (NumberPicker)view.findViewById(R.id.pref_num_picker);
-        // TODO this should be an XML parameter:
         picker.setMaxValue(255);
         picker.setMinValue(0);
         if ( this.initialValue != null ) picker.setValue(initialValue);
@@ -31,6 +29,7 @@ public class NumberPickerPreference extends DialogPreference {
     @Override
     public void onClick(DialogInterface dialog, int which) {
         super.onClick(dialog, which);
+        //If user confirms save the new value
         if ( which == DialogInterface.BUTTON_POSITIVE ) {
             this.initialValue = picker.getValue();
             persistInt( initialValue );
