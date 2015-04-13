@@ -7,11 +7,11 @@
     <string name="pref_header_general">Video Processing</string>
 
     <string name="pref_title_motion_detection_algorithm">Motion detection methods</string>
-    <string name="pref_description_motion_detection_algorithm">Select the method which better suits your need
+    <string name="pref_description_motion_detection_algorithm">Select the method which better suits your need.
     </string>
 
     <string name="pref_title_motion_detection_threshold">Threshold</string>
-    <string name="pref_description_motion_detection_threshold">Select the threshold which better suits your need
+    <string name="pref_description_motion_detection_threshold">Select the threshold which better suits your need.
     </string>
 
     <string-array name="pref_motion_detection_algorithm_list_tiles">
