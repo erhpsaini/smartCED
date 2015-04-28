@@ -61,18 +61,18 @@ import java.util.ArrayList;
     private static android.graphics.Point mDisplaySize;
 
     //Booleans used for app's state
-    private static boolean mProcessingModeOn = false;
-    private static boolean mMultipleViewModeOn = false;
-    private static boolean mProcessButtonIsPressed = false;
-    private static boolean mIsMaskCreationModeOn = false;
-    private static boolean mIsMaskConfirmationHanging = false;
+    private static boolean mProcessingModeOn;/*false*/
+    private static boolean mMultipleViewModeOn;/*false*/
+    private static boolean mProcessButtonIsPressed;/*false*/
+    private static boolean mIsMaskCreationModeOn;/*false*/
+    private static boolean mIsMaskConfirmationHanging;/*false*/
     //Boolean used for initial processing setup
-    private static boolean mFirstTime = true;
+    private static boolean mFirstTime;/*true*/
     //Booleans used with timer
-    private static boolean mTimerHasStarted = false;
-    private static boolean mTimeOut = false;
+    private static boolean mTimerHasStarted;/*false*/
+    private static boolean mTimeOut;/*false*/
     //Boolean used to activate/deactivate onTouch method's functionality
-    private static boolean mIsSingleDiffDoubleDiffViewMode = false;
+    private static boolean mIsSingleDiffDoubleDiffViewMode;/*false*/
 
     //Base frame size
     private static final int BASE_FRAME_WIDTH = 640;
@@ -166,6 +166,8 @@ import java.util.ArrayList;
         Log.i(TAG, "called onCreate");
 
         super.onCreate(savedInstanceState);
+
+        initVariables();
 
         //Getting app's context for the future use
         mContext = getApplicationContext();
@@ -703,4 +705,19 @@ import java.util.ArrayList;
         }
     }
 
+    private void initVariables(){
+        //Booleans used for app's state
+        mProcessingModeOn = false;
+        mMultipleViewModeOn = false;
+        mProcessButtonIsPressed = false;
+        mIsMaskCreationModeOn = false;
+        mIsMaskConfirmationHanging = false;
+        //Boolean used for initial processing setup
+        mFirstTime = true;
+        //Booleans used with timer
+        mTimerHasStarted = false;
+        mTimeOut = false;
+        //Boolean used to activate/deactivate onTouch method's functionality
+        mIsSingleDiffDoubleDiffViewMode = false;
+    }
 }
