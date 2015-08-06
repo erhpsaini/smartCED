@@ -54,7 +54,7 @@ JNIEXPORT jint JNICALL Java_com_hsbsoftwares_android_app_healthdiagnostic_native
 
         for (i = 0; i < lumSize; i++) {
             normalizedLum[i] = (double)(lum[i]/max);
-            if (lum[i] < 0.15) lum[i]=0; //deleting residual noise 0.15
+            if (normalizedLum[i] <= 0.45) normalizedLum[i]=0; //deleting residual noise 0.15 // OLD: if (lum[i] <= 0.40) lum[i]=0;
             LOGD("[%d] = %.4lf\n", i, normalizedLum[i]);
         }
 
@@ -108,7 +108,7 @@ JNIEXPORT jint JNICALL Java_com_hsbsoftwares_android_app_healthdiagnostic_native
         //jni method.
         (*env)->ReleaseIntArrayElements(env, lumVector, lum, 0);
 
-        //if(lumSize*pow(amplitude,2) > 1.5)
-        if( amplitude > 0.1) return 1;
+        //if(lumSize*pow(amplitude,2) > 1.1) return 1;
+        if(amplitude > 0.084) return 1;
         else return 0;
   }

@@ -326,13 +326,18 @@ import java.util.ArrayList;
                 mLumArrayList.add(Core.countNonZero(mResultFrame));
 
                 if(mTimeOut) {
-                    ArrayList<Integer> lumArrayList = new ArrayList<Integer>(mLumArrayList);
+                    final ArrayList<Integer> lumArrayList = new ArrayList<Integer>(mLumArrayList);
                     //After the timeout reset the list
                     mLumArrayList.clear();
                     //Prepare and launch task avery 10 seconds
-                    PathologyProcessingTask pathologyProcessingTask = new PathologyProcessingTask(mContext);
-                    pathologyProcessingTask.setmEmergencyAlarmListener(this);
-                    pathologyProcessingTask.execute(lumArrayList);
+                    CameraActivity.this.runOnUiThread(new Runnable() {
+                        public void run() {
+                            PathologyProcessingTask pathologyProcessingTask = new PathologyProcessingTask(mContext);
+                            pathologyProcessingTask.setmEmergencyAlarmListener(CameraActivity.this);
+                            pathologyProcessingTask.execute(lumArrayList);
+                        }
+                    });
+
                     mTimeOut = false;
                 }
             }else {//If processing mode is off simply show gray scale frames
@@ -695,6 +700,13 @@ import java.util.ArrayList;
         @Override
         public void onTick(long millisUntilFinished) {
             Log.i(TAG, "" + (int) (millisUntilFinished/1000));
+            //Temporary solution for stopping the ringtone play
+            if((int)(millisUntilFinished/1000) == 6){
+                if(mEmergencyRingtone.isPlaying()) {
+                    mEmergencyRingtone.stop();
+                    mEmergencyButton.setVisibility(View.GONE);
+                }
+            }
         }
 
         @Override
