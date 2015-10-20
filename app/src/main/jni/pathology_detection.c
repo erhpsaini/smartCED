@@ -109,6 +109,6 @@ JNIEXPORT jint JNICALL Java_com_hsbsoftwares_android_app_healthdiagnostic_native
         (*env)->ReleaseIntArrayElements(env, lumVector, lum, 0);
 
         //if(lumSize*pow(amplitude,2) > 1.1) return 1;
-        if(amplitude > 0.084) return 1;
+        if(amplitude > 0.058) return 1;//0.084 old value
         else return 0;
   }
