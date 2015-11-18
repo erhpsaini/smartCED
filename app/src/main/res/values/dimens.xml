@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="title">17dp</dimen>
+    <dimen name="rating">11dip</dimen><!--Start date -->
+    <dimen name="genre">10dip</dimen><!--Elapsed time -->
+    <dimen name="year">11dip</dimen><!--End date -->
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+</resources>

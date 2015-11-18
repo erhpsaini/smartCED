@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.hsbsoftwares.android.app.healthdiagnostic.statistics.StatisticsActivity">
+
+    <Button
+        android:id="@+id/NumberCrisisPerDay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Number crisis per day"
+        android:onClick="openNumberCrisisPerDay"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/NumberCrisisPerMonth"
+        android:onClick="openNumberCrisisPerMonth"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Number Crisis Per Month"
+        android:layout_below="@+id/NumberCrisisPerDay"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="30dp" />
+
+    <Button
+        android:id="@+id/NumberCrisisPerYear"
+        android:onClick="openNumberCrisisPerYear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Number Crisis Per Year"
+        android:layout_below="@+id/NumberCrisisPerMonth"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="30dp" />
+
+    <Button
+        android:id="@+id/NumberCrisisPerState"
+        android:onClick="openNumberCrisisPerState"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Number Crisis Per State"
+        android:layout_below="@+id/NumberCrisisPerYear"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+
+    <Button
+        android:id="@+id/DailyAverage"
+        android:onClick="openDailyAverage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Daily Average"
+        android:layout_below="@+id/NumberCrisisPerState"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp" />
+
+</RelativeLayout>
