@@ -1,12 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:opencv="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal"
     android:id="@+id/activity_camera"
     android:touchscreenBlocksFocus="false"
     android:animateLayoutChanges="true">
+
+    <TextureView
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        android:id="@+id/surface_view"
+        tools:targetApi="ice_cream_sandwich" />
 
     <com.hsbsoftwares.android.app.healthdiagnostic.CameraView
         android:layout_width="match_parent"
@@ -91,6 +98,36 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:onClick="showMaskCreationPopupMenu"/>
+
+    <ImageButton
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/ic_launcher_list"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
+        android:id="@+id/listViewButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:contentDescription="@string/list_view"
+        android:layout_above="@+id/maskButton"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:onClick="openListViewActivity" />
+
+    <ImageButton
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:src="@drawable/ic_launcher_bar"
+        android:scaleType="fitCenter"
+        android:adjustViewBounds="true"
+        android:padding="10dp"
+        android:id="@+id/chartViewButton"
+        style="?android:attr/borderlessButtonStyle"
+        android:contentDescription="@string/bar_view"
+        android:onClick="openStatisticsActivity"
+        android:layout_above="@+id/listViewButton"
+        android:layout_toRightOf="@+id/surface_view"
+        android:layout_toEndOf="@+id/surface_view" />
 
     <android.gesture.GestureOverlayView
         android:layout_width="match_parent"
