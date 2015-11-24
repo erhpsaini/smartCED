@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisi;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.DailyAverage;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.ElapsedTimes;
+import com.hsbsoftwares.android.app.healthdiagnostic.db.model.MonthlyAverage;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.NumberCrisisPerDay;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.NumberCrisisPerMonth;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.NumberCrisisPerState;
@@ -296,17 +297,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return numberCrisisPerDayList;
     }
 
-    public List<NumberCrisisPerMonth> getNumberCrisisPerMonth(String year) {
+    public List<NumberCrisisPerMonth> getNumberCrisisPerMonth(String startDate, String endDate) {
         List<NumberCrisisPerMonth> numberCrisisPerMonthList = new ArrayList<NumberCrisisPerMonth>();
         // Select All Query
 
         //SELECT monthname(startDate) AS Month, COUNT(ID) AS NumberOfCrisis
         //FROM crisi WHERE YEAR (`StartDate`) = '2015'
         //GROUP BY monthname(startDate);
-        String selectQuery = "SELECT STRFTIME('%m', "
+        String selectQuery = "SELECT STRFTIME('%Y-%m', "
                 + KEY_START_DATE + ") AS Month, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
-                + TABLE_CRISIS + " WHERE STRFTIME('%Y', " + KEY_START_DATE + ") = '" + year
-                + "' GROUP BY STRFTIME('%m', " + KEY_START_DATE + ")";
+                + TABLE_CRISIS +  " WHERE STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") >= STRFTIME('%Y-%m-%d', '" + startDate
+                + "') AND STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") <= STRFTIME('%Y-%m-%d', '" + endDate
+                + "') GROUP BY STRFTIME('%Y-%m', " + KEY_START_DATE + ")";
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -390,9 +392,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         //FROM crisi
         //GROUP BY latitude, longitude;
 
-        String selectQuery =  "SELECT " + KEY_LATITUDE + ", " + KEY_LONGITUDE
+//        String selectQuery =  "SELECT " + KEY_LATITUDE + ", " + KEY_LONGITUDE
+//                + ", COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM " + TABLE_CRISIS
+//                + " GROUP BY " + KEY_LATITUDE + ", " + KEY_LONGITUDE;
+        String selectQuery =  "SELECT " + KEY_COUNTRY
                 + ", COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM " + TABLE_CRISIS
-                + " GROUP BY " + KEY_LATITUDE + ", " + KEY_LONGITUDE;
+                + " GROUP BY " + KEY_COUNTRY;
 
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
@@ -403,8 +408,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             do {
                 NumberCrisisPerState numberCrisisPerState = new NumberCrisisPerState();
                 numberCrisisPerState.setId(i);
-                numberCrisisPerState.setLatitude(Double.parseDouble(cursor.getString(0)));
-                numberCrisisPerState.setLongitude(Double.parseDouble(cursor.getString(1)));
+                numberCrisisPerState.setCountryName(cursor.getString(0));
+                //numberCrisisPerState.setLatitude(Double.parseDouble(cursor.getString(0)));
+                //numberCrisisPerState.setLongitude(Double.parseDouble(cursor.getString(1)));
                /* try {
                     address = getAddress(Double.parseDouble(cursor.getString(0)), Double.parseDouble(cursor.getString(0)));
                     Log.d("Log: ", address.getAddressLine(0));
@@ -416,7 +422,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 //String CountryName = address.getAddressLine(0);
                 //numberCrisisPerState.setCountryName(CountryName);
                 //numberCrisisPerState.setLocality(address.getLocality());
-                numberCrisisPerState.setNumberOfCrisis(Integer.parseInt(cursor.getString(2)));
+                numberCrisisPerState.setNumberOfCrisis(Integer.parseInt(cursor.getString(1)));
                 //numberCrisisPerState.setNumberOfCrisis(Integer.parseInt(cursor.getString(1)));
                 // Adding crisi to list
                 numberCrisisPerStateList.add(numberCrisisPerState);
@@ -476,6 +482,54 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
         // return crisi list
         return dailyAverageList;
+    }
+    public List<MonthlyAverage> getMonthlyAverage(String startDate, String endDate){
+        List<MonthlyAverage> monthlyAverageList = new ArrayList<>();
+
+        //SELECT DATE(`StartDate`) AS Days,
+        //SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration,
+        //COUNT(ID) AS NumberOfCrisis
+        //FROM crisi
+        //GROUP BY DATE(`StartDate`)
+//        String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
+//                + KEY_START_DATE + ") AS Days, (AVG(STRFTIME ('%s', " + KEY_END_DATE
+//                + ") - STRFTIME ('%s', " + KEY_START_DATE + ")))/60 AS AverageCrisisDuration, COUNT (" + KEY_ID
+//                + ") AS NumberOfCrisis FROM "
+//                + TABLE_CRISIS + " GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
+
+//        SELECT DATE(`StartDate`) AS Days,
+//        SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration
+//        FROM crisi
+//        WHERE `StartDate` >= '2014-11-05' AND `StartDate` <= '2015-11-06'
+//        GROUP BY DATE(`StartDate`)
+
+        String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
+                + KEY_START_DATE + ") AS Days, (AVG(STRFTIME ('%s', " + KEY_END_DATE
+                + ") - STRFTIME ('%s', " + KEY_START_DATE + ")))/60 AS AverageCrisisDuration FROM "
+                + TABLE_CRISIS + " WHERE STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") >= STRFTIME('%Y-%m-%d', '" + startDate
+                + "') AND STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") <= STRFTIME('%Y-%m-%d', '" + endDate
+                + "') GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        // looping through all rows and adding to list
+        if (cursor.moveToFirst()) {
+            int i=1;
+            do {
+                MonthlyAverage monthlyAverage = new MonthlyAverage();
+                monthlyAverage.setId(i);
+                monthlyAverage.setMonth(cursor.getString(0));
+                monthlyAverage.setAverageCrisisDuration(cursor.getString(1));
+                //dailyAverage.setNumberOfCrisis(Integer.parseInt(cursor.getString(2)));
+                // Adding crisi to list
+                monthlyAverageList.add(monthlyAverage);
+                i++;
+            } while (cursor.moveToNext());
+        }
+        db.close();
+        // return crisi list
+        return monthlyAverageList;
     }
     public List<YearlyAverage> getYearlyAverage(String startDate, String endDate){
         List<YearlyAverage> yearlyAverageList = new ArrayList<YearlyAverage>();
