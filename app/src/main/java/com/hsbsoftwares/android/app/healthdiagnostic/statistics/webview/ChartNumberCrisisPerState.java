@@ -51,42 +51,35 @@ public class ChartNumberCrisisPerState extends Activity {
 
         html.append("<html>");
         html.append("<head>");
-        html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
-        html.append("<script type=\"text/javascript\">");
+        html.append("<script type='text/javascript' src='https://www.google.com/jsapi'></script>");
+        html.append("<script type='text/javascript'>");
 
-        html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"map\"]});");
-        html.append("google.setOnLoadCallback(drawChart);");
-        html.append("function drawChart() {");
+        html.append("google.load('visualization', '1', {'packages':['geochart']});");
+        html.append("google.setOnLoadCallback(drawMarkersMap);");
+        html.append("function drawMarkersMap() {");
         html.append("var data = google.visualization.arrayToDataTable([");
-        html.append("['Lat', 'Long', 'Number of Crisis'],");
+        html.append("['Country', 'Number of Crisis'],");
         for (NumberCrisisPerState ncps  : numberCrisisPerState){
-
-            /*
-            try {
-                address = getAddress(ncps.getLatitude(), ncps.getLongitude());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            */
-
-            html.append("[");
-            html.append(ncps.getLatitude());
-            //html.append(address.getCountryName());
-            html.append(", ");
-            html.append(ncps.getLongitude());
-            html.append(", ");
+            html.append("['");
+            //html.append(ncps.getLatitude());
+            html.append(ncps.getCountryName());
+            html.append("', ");
+            //html.append(ncps.getLongitude());
+            //html.append(", ");
             html.append(ncps.getNumberOfCrisis());
             html.append("],");
         }
         html.deleteCharAt(html.length() - 1);
         html.append("]);");
-        //html.append(" var options = {};");
-        html.append("var map = new google.visualization.Map(document.getElementById('map_div'));");
-        html.append("map.draw(data, {showTip: true});");
+        html.append("var options = {sizeAxis: { minValue: 0, maxValue: 100 }, " +
+                "region: 'world', displayMode: 'markers', colorAxis: {colors: ['#e7711c', '#4374e0']}};");
+        //html.append("var options = {};");
+        html.append("var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));");
+        html.append("chart.draw(data, options);");
         html.append("}</script>");
         html.append("</head>");
         html.append("<body>");
-        html.append("<div id=\"map_div\" style=\"width: 400px; height: 300px\"></div>\n");
+        html.append("<div id=\"chart_div\" style=\"width: 900px; height: 500px;\"></div>");
         html.append("</body></html>");
 
         return html;
