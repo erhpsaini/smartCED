@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.gesture.GestureOverlayView;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.location.Address;
 import android.location.Geocoder;
@@ -20,6 +21,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Display;
@@ -39,6 +41,7 @@ import com.hsbsoftwares.android.app.healthdiagnostic.db.model.DailyAverage;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.NumberCrisisPerState;
 import com.hsbsoftwares.android.app.healthdiagnostic.gps.GPSTracker;
 import com.hsbsoftwares.android.app.healthdiagnostic.listviewactivity.ListViewActivity;
+import com.hsbsoftwares.android.app.healthdiagnostic.mediarecorder.media.CameraHelper;
 import com.hsbsoftwares.android.app.healthdiagnostic.motiondetection.MotionDetection;
 import com.hsbsoftwares.android.app.healthdiagnostic.statistics.StatisticsActivity;
 
@@ -55,6 +58,15 @@ import org.opencv.core.Scalar;
 import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
+
+import android.hardware.Camera;
+import android.hardware.Camera.PictureCallback;
+
+import org.opencv.highgui.VideoCapture;
+import org.opencv.highgui.Highgui;
+
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -67,8 +79,6 @@ import java.util.Locale;
 public class CameraActivity extends Activity implements CameraBridgeViewBase.CvCameraViewListener2,
         View.OnTouchListener, IEmergencyAlarmListener, GestureOverlayView.OnGestureListener {
 
-
-    private String locality = null;
     private String countryCode = null;
     private String countryName = null;
     private String thoroughfare;
@@ -84,7 +94,14 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private double longitude;
     private String startDate;
     private String endDate;
-    private TextureView mPreview;
+    private String locality;
+    private String country;
+    private Address address;
+    private String mCurrentPhotoPath;
+    //private TextureView mPreview;
+    //private CameraView mPreview;
+    private static final String TAG2 = "myCameraView";
+    private String mPictureFileName;
     private Camera mCamera;
     private static DatabaseHandler databaseHandler;
     private long l1;
@@ -171,6 +188,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     private ImageButton mDiscardMaskButton;
     private ImageButton mConfirmMaskButton;
     private ImageButton mlistViewButton;
+    private ImageButton mchartViewButton;
 
     //Particular view used with mask creation functionality
     private static GestureOverlayView mGOV;
@@ -224,11 +242,33 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         /******************************************************************************************/
         // create class object
         gps = new GPSTracker(CameraActivity.this);
+        //databaseHandler = DatabaseHandler.getInstance(this);
         if (gps.canGetLocation()) {
 
             String msg;
             latitude = gps.getLatitude();
             longitude = gps.getLongitude();
+            try {
+                address = getAddress(latitude, longitude);
+                locality = address.getLocality();
+                country = address.getCountryName();
+                //insert();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+//            List<Crisi> crisis = databaseHandler.getAllCrisis();
+//            for (Crisi cn : crisis) {
+//                String log = "Id: "+cn.getId()+", Date start: " + cn.getStartDate() + ", Date end: "
+//                        + cn.getEndDate() + ", latitude: " + cn.getLatitude() + ", longitude: " + cn.getLongitude()
+//                        + ", Locality: " + cn.getLocality()+ ", Country: " + cn.getCountry();
+//                // Writing Contacts to log
+//                Log.d("Name ", log);
+//
+//            }
+
+
             /*
             try {
                 //Locality = gps.getAddress();
@@ -255,9 +295,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             Log.i(TAG, msg);
             */
             Toast.makeText(getApplicationContext(),
-                    "Your Location is - \nLat: " + latitude + "\nLong: " + longitude,
+                    "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nLocality: " + locality + "\nCountry: " + country,
                     Toast.LENGTH_LONG).show();
-            msg = "Your Location is - \nLat: " + latitude + "\nLong: " + longitude;
+            msg = "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nLocality: " + locality + "\nCountry: " + country;
             Log.i(TAG, msg);
         } else {
             // can't get location
@@ -283,6 +323,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         //Camera and camera view setup
         mOpenCvCameraView = (CameraView) findViewById(R.id.java_surface_view);
+        //mPreview = (CameraView) findViewById(R.id.java_surface_view);
+
         //The base frame for us is 640x480 for processing performances reasons.
         mOpenCvCameraView.setMaxFrameSize(BASE_FRAME_WIDTH, BASE_FRAME_HEIGHT);
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
@@ -296,7 +338,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mDiscardMaskButton      = (ImageButton) findViewById(R.id.discardMaskButton);
         mConfirmMaskButton      = (ImageButton) findViewById(R.id.confirmMaskButton);
         mlistViewButton         = (ImageButton) findViewById(R.id.listViewButton);
-        mPreview                = (TextureView) findViewById(R.id.surface_view);
+        mchartViewButton        = (ImageButton) findViewById(R.id.chartViewButton);
+        //mPreview                = (TextureView) findViewById(R.id.surface_view);
 
         mGOV = (GestureOverlayView)findViewById(R.id.gestureOverlayView);
         mGOV.addOnGestureListener(CameraActivity.this);
@@ -322,6 +365,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         //log();
         //insert();
+        /*
         databaseHandler = DatabaseHandler.getInstance(getAppContext());
         List<DailyAverage> dailyAverage = databaseHandler.getDailyAverage();
         for(DailyAverage da : dailyAverage){
@@ -330,6 +374,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                     + " Number Of Crisis: " + da.getNumberOfCrisis();
             Log.d("Name: ", log);
         }
+        */
 
         /*
         databaseHandler = DatabaseHandler.getInstance(getAppContext());
@@ -356,11 +401,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
     public void onPause() {
         super.onPause();
 
-        // if we are using MediaRecorder, release it first
-        //releaseMediaRecorder();
-        // release the camera immediately on pause event
-        //releaseCamera();
-
         //Disabling camera view and releasing camera (important!!)
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
@@ -378,6 +418,11 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mLumArrayList.clear();
         mProcessButton.setImageResource(R.drawable.start_processing_btn_img);
         mGOV.setVisibility(View.GONE);
+
+//        // if we are using MediaRecorder, release it first
+//        releaseMediaRecorder();
+//        // release the camera immediately on pause event
+//        releaseCamera();
     }
 
     @Override
@@ -395,6 +440,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             mConfirmMaskButton.setVisibility(View.VISIBLE);
             mDiscardMaskButton.setVisibility(View.VISIBLE);
             mlistViewButton.setVisibility(View.VISIBLE);
+            mchartViewButton.setVisibility(View.VISIBLE);
         }else if(mIsMaskCreationModeOn){
             mGOV.setVisibility(View.VISIBLE);
         }else {
@@ -506,6 +552,18 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             }
         }
 
+//        List<Crisi> crisis2 = databaseHandler.getAllCrisis();
+//        for (Crisi cn : crisis2) {
+//            int update = databaseHandler.updateCrisi2(cn);
+//            String log = "Id: "+cn.getId()+", Date start: " + cn.getStartDate() + ", Date end: "
+//                    + cn.getEndDate() + " , latitude: " + cn.getLatitude() + ", longitude: " + cn.getLongitude()
+//                    + ", Locality: " + cn.getLocality()+ ", Country: " + cn.getCountry()
+//                    + " Update: " + update;
+//            // Writing Contacts to log
+//            Log.d("Name2 ", log);
+//
+//        }
+
         return false;
     }
 
@@ -541,6 +599,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             mViewModeButton.setVisibility(View.GONE);
             mMaskButton.setVisibility(View.GONE);
             mlistViewButton.setVisibility(View.GONE);
+            mchartViewButton.setVisibility(View.GONE);
 
 
             // BEGIN_INCLUDE(prepare_start_media_recorder)
@@ -553,18 +612,19 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             mViewModeButton.setVisibility(View.VISIBLE);
             mMaskButton.setVisibility(View.VISIBLE);
             mlistViewButton.setVisibility(View.VISIBLE);
+            mchartViewButton.setVisibility(View.VISIBLE);
             // BEGIN_INCLUDE(stop_release_media_recorder)
 
-            // stop recording and release camera
-            //mMediaRecorder.stop();  // stop the recording
-            //releaseMediaRecorder(); // release the MediaRecorder object
-            //mCamera.lock();         // take camera access back from MediaRecorder
-
-            // inform the user that recording has stopped
-            //setCaptureButtonText("Capture");
-            //isRecording = false;
-            //releaseCamera();
-            // END_INCLUDE(stop_release_media_recorder)
+//            // stop recording and release camera
+//            mMediaRecorder.stop();  // stop the recording
+//            releaseMediaRecorder(); // release the MediaRecorder object
+//            mCamera.lock();         // take camera access back from MediaRecorder
+//
+//             //inform the user that recording has stopped
+//            //setCaptureButtonText("Capture");
+//            isRecording = false;
+//            releaseCamera();
+//            // END_INCLUDE(stop_release_media_recorder)
         }
     }
 
@@ -587,7 +647,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         builder.setTitle("Select view mode");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                switch(which) {
+                switch (which) {
                     case RGBA_VIEW:
                         mProcessButton.setVisibility(View.VISIBLE);
                         mMultipleViewModeOn = false;
@@ -640,10 +700,10 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         builder.setTitle("What would you like to do?");
         builder.setItems(items, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                switch(which) {
+                switch (which) {
                     case CREATE_MASK:
                         mIsMaskCreationModeOn = true;
-                        if(mMask != null){
+                        if (mMask != null) {
                             //Removing mask
                             mMask.release();
                             mMask = null;
@@ -656,7 +716,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                         Toast.makeText(getApplicationContext(), "Create your mask.", Toast.LENGTH_SHORT).show();
                         break;
                     case CLEAR_MASK:
-                        if(mMask != null){
+                        if (mMask != null) {
                             //Removing mask
                             mMask.release();
                             mMask = null;
@@ -684,7 +744,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         Mat processedFrameDoubleDiff;
         //Temporary right and left sub frames
         Mat subSx = currentGrayFrame.submat(0, currentGrayFrame.rows(), 0, currentGrayFrame.cols() / 2);
-        Mat subDx = currentGrayFrame.submat(0, currentGrayFrame.rows(), currentGrayFrame.cols()/2, currentGrayFrame.cols());
+        Mat subDx = currentGrayFrame.submat(0, currentGrayFrame.rows(), currentGrayFrame.cols() / 2, currentGrayFrame.cols());
 
         //Getting sub frames size
         Size subSxSize = subSx.size();
@@ -863,8 +923,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         }
     }
-    */
-    /*
+
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     private boolean prepareVideoRecorder(){
 
@@ -952,7 +1011,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         }
     }
     */
-
     @Override
     public void onInit() {
         startDate = getDateTime();
@@ -962,6 +1020,38 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             e.printStackTrace();
         }
         Log.i(TAG, "Called onInit... StartDate: " + startDate);
+
+        matToJpeg(mResultFrame);
+    }
+    public void matToJpeg(Mat inputFrame){
+        Log.d("matToJpeg", "take an image");
+        //Mat currentRgbaFrame = inputFrame;
+        //Highgui.imwrite("/sdcard/imagetest.jpg", inputFrame);
+        try {
+            Highgui.imwrite(createImageFile().getAbsolutePath(),inputFrame);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+//        VideoCapture video = new VideoCapture();
+//        video.read(inputFrame);
+        //return currentGrayFrame;
+    }
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        Log.d("matToJpeg", "Path: " + mCurrentPhotoPath);
+        return image;
     }
     @Override
     public void onStopEmergency() {
@@ -979,7 +1069,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             Log.i(TAG, "Elapsed Time: d1=" + d1 + " d2=" + d2 + " diff =" + diff);
 
             Log.d("Insert: ", "Inserting ..");
-            databaseHandler.addCrisi(new Crisi(startDate, endDate, latitude, longitude));
+            databaseHandler.addCrisi(new Crisi(startDate, endDate, latitude, longitude, locality, country));
 
             // Reading all contacts
             Log.d("Reading: ", "Reading all crisis..");
@@ -1009,6 +1099,19 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                 "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date date = new Date();
         return dateFormat.format(date);
+    }
+    public Address getAddress(double latitude, double longitude) throws IOException {
+        if (latitude == 0 || longitude == 0) {
+            return new Address(null);
+        }
+        gcd=new Geocoder(this);
+        //gcd=new Geocoder(getAppContext(), Locale.getDefault());
+        Address address=null;
+        List<Address> addresses=gcd.getFromLocation(latitude, longitude, 1);
+        if (addresses.size() > 0) {
+            address=addresses.get(0);
+        }
+        return address;
     }
     /**********************************************************************************************/
 
@@ -1095,60 +1198,76 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
     private void insert(){
         endDate = getDateTime();
-        databaseHandler = DatabaseHandler.getInstance(getAppContext());
+        databaseHandler = DatabaseHandler.getInstance(this);
         //Log.i(TAG, "Called onStopEmergency... EndDate: " + endDate);
 
-        //databaseHandler.addCrisi(new Crisi(startDate, endDate, latitude, longitude));
-        databaseHandler.addCrisi(new Crisi("2012-08-05 19:26:16", "2012-08-05 19:26:24", -11.8666667,-67.2333333));
-        databaseHandler.addCrisi(new Crisi("2012-08-05 20:26:16", "2012-08-05 20:27:44", 13.3477778,-87.0072222));
-        databaseHandler.addCrisi(new Crisi("2012-08-05 21:26:16", "2012-08-05 21:26:04", 13.3477778,-87.0072222));
-        databaseHandler.addCrisi(new Crisi("2012-08-05 22:26:16", "2012-08-05 22:36:27", 36.1666667,1.1666667));
-        databaseHandler.addCrisi(new Crisi("2012-08-05 23:26:16", "2012-08-05 23:27:11", 36.1666667,1.1666667));
-        databaseHandler.addCrisi(new Crisi("2012-08-06 08:26:16", "2012-08-06 08:26:33", 36.1666667,1.1666667));
-        databaseHandler.addCrisi(new Crisi("2012-08-06 09:26:16", "2012-08-06 09:27:08", 7.0166667,12.6666667));
-        databaseHandler.addCrisi(new Crisi("2012-08-06 10:26:16", "2012-08-06 10:28:44", 7.0166667,12.6666667));
-        databaseHandler.addCrisi(new Crisi("2012-08-07 19:26:16", "2012-08-07 19:26:24", 7.0166667,12.6666667));
-        databaseHandler.addCrisi(new Crisi("2012-08-07 20:26:16", "2012-08-07 20:27:44", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2012-08-07 21:26:16", "2012-08-07 21:26:04", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2012-08-08 22:26:16", "2012-08-08 22:36:27", -6.855278,107.580278));
-        databaseHandler.addCrisi(new Crisi("2012-08-08 23:26:16", "2012-08-08 23:27:11", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2012-08-08 08:26:16", "2012-08-08 08:26:33", -6.855278,107.580278));
-        databaseHandler.addCrisi(new Crisi("2012-08-09 09:26:16", "2012-08-09 09:27:08", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2012-08-09 10:26:16", "2012-08-09 10:28:44", 44.773726,6.033683));
+        //databaseHandler.addCrisi(new Crisi(startDate, endDate, latitude, longitude, locality, country));
+        //databaseHandler.addCrisi(new Crisi("2012-08-05 19:26:16", "2012-08-05 19:26:24", -11.8666667,-67.2333333));databaseHandler.addCrisi(new Crisi("2012-08-05 19:26:16", "2012-08-05 19:26:24", -11.8666667,-67.2333333, locality, country));
+        databaseHandler.addCrisi(new Crisi("2012-08-05 19:26:16", "2012-08-05 19:26:24", 48.85661400000001,2.3522219000000177, "Paris", "France"));
+        databaseHandler.addCrisi(new Crisi("2012-08-05 20:26:16", "2012-08-05 20:27:44", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+        databaseHandler.addCrisi(new Crisi("2012-08-05 21:26:16", "2012-08-05 21:26:04", 45.5016889,-73.56725599999999, "Montreal", "QC Canada"));
+        databaseHandler.addCrisi(new Crisi("2012-08-05 22:26:16", "2012-08-05 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
+        databaseHandler.addCrisi(new Crisi("2012-08-05 23:26:16", "2012-08-05 23:27:11", 55.755826,37.6173, "Moscow", "Russia"));
+        databaseHandler.addCrisi(new Crisi("2012-08-06 08:26:16", "2012-08-06 08:26:33", 39.904211,116.40739499999995, "Beijing", "China"));
+        databaseHandler.addCrisi(new Crisi("2012-08-06 09:26:16", "2012-08-06 09:27:08", 35.6894875,139.69170639999993, "Tokyo", "Japan"));
+        databaseHandler.addCrisi(new Crisi("2012-08-06 10:26:16", "2012-08-06 10:28:44", 28.6139391, 77.20902120000005, "New Delhi", "India"));
+        databaseHandler.addCrisi(new Crisi("2012-08-07 19:26:16", "2012-08-07 19:26:24", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2012-08-07 20:26:16", "2012-08-07 20:27:44", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2012-08-07 21:26:16", "2012-08-07 21:26:04", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+        databaseHandler.addCrisi(new Crisi("2012-08-08 22:26:16", "2012-08-08 22:36:27", 48.85661400000001,2.3522219000000177, "Paris", "France"));
+        databaseHandler.addCrisi(new Crisi("2012-08-08 23:26:16", "2012-08-08 23:27:11", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+        databaseHandler.addCrisi(new Crisi("2012-08-08 08:26:16", "2012-08-08 08:26:33", 48.85661400000001,2.3522219000000177, "Paris", "France"));
+        databaseHandler.addCrisi(new Crisi("2012-08-09 09:26:16", "2012-08-09 09:27:08", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+        databaseHandler.addCrisi(new Crisi("2012-08-09 10:26:16", "2012-08-09 10:28:44", 35.6894875,139.69170639999993, "Tokyo", "Japan"));
 
-        databaseHandler.addCrisi(new Crisi("2013-07-05 19:26:16", "2013-07-05 19:26:24", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2013-07-05 20:26:16", "2013-07-05 20:27:44", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2013-07-05 21:26:16", "2013-07-05 21:26:04", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2013-07-05 22:26:16", "2013-07-05 22:36:27", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2013-07-05 23:26:16", "2013-07-05 23:27:11", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2013-07-06 08:26:16", "2013-07-06 08:26:33", -6.855278,107.580278));
-        databaseHandler.addCrisi(new Crisi("2013-07-06 09:26:16", "2013-07-06 09:27:08", 45.583333,9.516667));
-        databaseHandler.addCrisi(new Crisi("2013-07-06 10:26:16", "2013-07-06 10:28:44", 45.583333,9.516667));
-        databaseHandler.addCrisi(new Crisi("2013-07-07 19:26:16", "2013-07-07 19:26:24", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2013-07-07 20:26:16", "2013-07-07 20:27:44", 7.0166667,12.6666667));
-        databaseHandler.addCrisi(new Crisi("2013-07-07 21:26:16", "2013-07-07 21:26:04", 7.0166667,12.6666667));
-        databaseHandler.addCrisi(new Crisi("2013-07-08 22:26:16", "2013-07-08 22:36:27", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2013-07-08 23:26:16", "2013-07-08 23:27:11", 45.583333,9.516667));
-        databaseHandler.addCrisi(new Crisi("2013-07-08 08:26:16", "2013-07-08 08:26:33", 45.583333,9.516667));
-        databaseHandler.addCrisi(new Crisi("2013-07-09 09:26:16", "2013-07-09 09:27:08", 47.346667,81.187778));
-        databaseHandler.addCrisi(new Crisi("2013-07-09 10:26:16", "2013-07-09 10:28:44", 7.0166667,12.6666667));
+        databaseHandler.addCrisi(new Crisi("2012-07-05 19:26:16", "2012-07-05 19:26:24", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+        databaseHandler.addCrisi(new Crisi("2012-07-05 20:26:16", "2012-07-05 20:27:44", 35.6894875,139.69170639999993, "Tokyo", "Japan"));
+        databaseHandler.addCrisi(new Crisi("2012-07-05 21:26:16", "2012-07-05 21:26:04", 45.5016889,-73.56725599999999, "Montreal", "QC Canada"));
+        databaseHandler.addCrisi(new Crisi("2012-07-05 22:26:16", "2012-07-05 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
+        databaseHandler.addCrisi(new Crisi("2012-07-05 23:26:16", "2012-07-05 23:27:11", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
+        databaseHandler.addCrisi(new Crisi("2012-07-06 08:26:16", "2012-07-06 08:26:33", 48.85661400000001,2.3522219000000177, "Paris", "France"));
+        databaseHandler.addCrisi(new Crisi("2012-07-06 09:26:16", "2012-07-06 09:27:08", 39.904211,116.40739499999995, "Beijing", "China"));
+        databaseHandler.addCrisi(new Crisi("2012-07-06 10:26:16", "2012-07-06 10:28:44", 39.904211,116.40739499999995, "Beijing", "China"));
+        databaseHandler.addCrisi(new Crisi("2012-07-07 19:26:16", "2012-07-07 19:26:24", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
+        databaseHandler.addCrisi(new Crisi("2012-07-07 20:26:16", "2012-07-07 20:27:44", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+        databaseHandler.addCrisi(new Crisi("2012-07-07 21:26:16", "2012-07-07 21:26:04", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+        databaseHandler.addCrisi(new Crisi("2012-07-08 22:26:16", "2012-07-08 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
+        databaseHandler.addCrisi(new Crisi("2012-07-08 23:26:16", "2012-07-08 23:27:11", 35.6894875,139.69170639999993, "Tokyo", "Japan"));
+        databaseHandler.addCrisi(new Crisi("2012-07-08 08:26:16", "2012-07-08 08:26:33", 39.904211,116.40739499999995, "Beijing", "China"));
+        databaseHandler.addCrisi(new Crisi("2012-07-09 09:26:16", "2012-07-09 09:27:08", 28.6139391, 77.20902120000005, "New Delhi", "India"));
+        databaseHandler.addCrisi(new Crisi("2012-07-09 10:26:16", "2012-07-09 10:28:44", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
 
-        databaseHandler.addCrisi(new Crisi("2014-06-05 19:26:16", "2014-06-05 19:26:24", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2014-06-05 20:26:16", "2014-06-05 20:27:44", 47.346667,81.187778));
-        databaseHandler.addCrisi(new Crisi("2014-06-05 21:26:16", "2014-06-05 21:26:04", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2014-06-05 22:26:16", "2014-06-05 22:36:27", 47.346667,81.187778));
-        databaseHandler.addCrisi(new Crisi("2014-06-05 23:26:16", "2014-06-05 23:27:11", 5.352285,-3.792823));
-        databaseHandler.addCrisi(new Crisi("2014-06-06 08:26:16", "2014-06-06 08:26:33", 5.352285,-3.792823));
-        databaseHandler.addCrisi(new Crisi("2014-06-06 09:26:16", "2014-06-06 09:27:08", 5.352285,-3.792823));
-        databaseHandler.addCrisi(new Crisi("2014-06-06 10:26:16", "2014-06-06 10:28:44", -35.25,-71.266667));
-        databaseHandler.addCrisi(new Crisi("2014-06-07 19:26:16", "2014-06-07 19:26:24", -35.25,-71.266667));
-        databaseHandler.addCrisi(new Crisi("2014-06-07 20:26:16", "2014-06-07 20:27:44", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2014-06-07 21:26:16", "2014-06-07 21:26:04", 44.773726,6.033683));
-        databaseHandler.addCrisi(new Crisi("2014-06-08 22:26:16", "2014-06-08 22:36:27", -35.25,-71.266667));
-        databaseHandler.addCrisi(new Crisi("2014-06-08 23:26:16", "2014-06-08 23:27:11", -11.8666667,-67.2333333));
-        databaseHandler.addCrisi(new Crisi("2014-06-08 08:26:16", "2014-06-08 08:26:33", -18.3166667,-62.9166667));
-        databaseHandler.addCrisi(new Crisi("2014-06-09 09:26:16", "2014-06-09 09:27:08", 42.5333333,1.5833333));
-        databaseHandler.addCrisi(new Crisi("2014-06-09 10:26:16", "2014-06-09 10:28:44", 42.5666667,1.5));
+        databaseHandler.addCrisi(new Crisi("2013-02-05 19:26:16", "2013-02-05 19:26:24", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2013-02-05 20:26:16", "2013-02-05 20:27:44", 28.6139391, 77.20902120000005, "New Delhi", "India"));
+        databaseHandler.addCrisi(new Crisi("2013-06-05 21:26:16", "2013-06-05 21:26:04", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2013-06-05 22:26:16", "2013-06-05 22:36:27", 28.6139391, 77.20902120000005, "New Delhi", "India"));
+        databaseHandler.addCrisi(new Crisi("2013-06-05 23:26:16", "2013-06-05 23:27:11", 39.904211,116.40739499999995, "Beijing", "China"));
+        databaseHandler.addCrisi(new Crisi("2013-06-06 08:26:16", "2013-06-06 08:26:33", 39.904211,116.40739499999995, "Beijing", "China"));
+        databaseHandler.addCrisi(new Crisi("2013-06-06 09:26:16", "2013-06-06 09:27:08", 39.904211,116.40739499999995, "Beijing", "China"));
+        databaseHandler.addCrisi(new Crisi("2013-06-06 10:26:16", "2013-06-06 10:28:44", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
+        databaseHandler.addCrisi(new Crisi("2013-06-07 19:26:16", "2013-06-07 19:26:24", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
+        databaseHandler.addCrisi(new Crisi("2013-06-07 20:26:16", "2013-06-07 20:27:44", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2013-06-07 21:26:16", "2013-06-07 21:26:04", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2013-06-08 22:26:16", "2013-06-08 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
+        databaseHandler.addCrisi(new Crisi("2013-06-08 23:26:16", "2013-06-08 23:27:11", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+        databaseHandler.addCrisi(new Crisi("2013-06-08 08:26:16", "2013-06-08 08:26:33", 45.5016889,-73.56725599999999, "Montreal", "QC Canada"));
+        databaseHandler.addCrisi(new Crisi("2013-06-09 09:26:16", "2013-06-09 09:27:08", 45.5016889,-73.56725599999999, "Montreal", "QC Canada"));
+        databaseHandler.addCrisi(new Crisi("2013-06-09 10:26:16", "2013-06-09 10:28:44", 45.5016889,-73.56725599999999, "Montreal", "QC Canada"));
+
+        databaseHandler.addCrisi(new Crisi("2014-07-08 22:26:16", "2014-07-08 22:36:27", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2014-07-08 23:26:16", "2014-07-08 23:27:11", 35.6894875,139.69170639999993, "Tokyo", "Japan"));
+        databaseHandler.addCrisi(new Crisi("2014-07-08 08:26:16", "2014-07-08 08:26:33", 39.904211,116.40739499999995, "Beijing", "China"));
+        databaseHandler.addCrisi(new Crisi("2014-07-09 09:26:16", "2014-07-09 09:27:08", 28.6139391, 77.20902120000005, "New Delhi", "India"));
+        databaseHandler.addCrisi(new Crisi("2014-07-09 10:26:16", "2014-07-09 10:28:44", 41.90278349999999,12.496365500000024, "Rome", "Italy"));
+
+        databaseHandler.addCrisi(new Crisi("2015-10-05 19:26:16", "2015-10-05 19:26:24", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2015-10-05 20:26:16", "2015-10-05 20:27:44", 28.6139391, 77.20902120000005, "New Delhi", "India"));
+        databaseHandler.addCrisi(new Crisi("2015-10-05 21:26:16", "2015-10-05 21:26:04", -33.9248685,18.424055299999964, "Capetown", "South Africa"));
+        databaseHandler.addCrisi(new Crisi("2015-10-05 22:26:16", "2015-10-05 22:36:27", 28.6139391, 77.20902120000005, "New Delhi", "India"));
+        databaseHandler.addCrisi(new Crisi("2015-10-05 23:26:16", "2015-10-05 23:27:11", 48.85661400000001,2.3522219000000177, "Paris", "France"));
+        databaseHandler.addCrisi(new Crisi("2015-11-06 08:26:16", "2015-11-06 08:26:33", 48.85661400000001,2.3522219000000177, "Paris", "France"));
+        databaseHandler.addCrisi(new Crisi("2015-11-06 09:26:16", "2015-11-06 09:27:08", 48.85661400000001,2.3522219000000177, "Paris", "France"));
+        databaseHandler.addCrisi(new Crisi("2015-11-06 10:26:16", "2015-11-06 10:28:44", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
 
         // Reading all contacts
         Log.d("Reading: ", "Reading all crisis..");
