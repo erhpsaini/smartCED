@@ -13,13 +13,13 @@ public class Crisi {
     String locality;
     String country;
     String ElapsedTime;
-    //String _location_image;
+    String currentPhotoPath;
 
     // Empty constructor
     public Crisi() {
     }
 
-    public Crisi(int id, String startDate, String endDate, double latitude, double longitude, String locality, String country) {
+    public Crisi(int id, String startDate, String endDate, double latitude, double longitude, String locality, String country, String currentPhotoPath) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -27,15 +27,17 @@ public class Crisi {
         this.longitude = longitude;
         this.locality = locality;
         this.country = country;
+        this.currentPhotoPath = currentPhotoPath;
     }
 
-    public Crisi(String startDate, String endDate, double latitude, double longitude, String locality, String country) {
+    public Crisi(String startDate, String endDate, double latitude, double longitude, String locality, String country, String currentPhotoPath) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.latitude = latitude;
         this.longitude = longitude;
         this.locality = locality;
         this.country = country;
+        this.currentPhotoPath = currentPhotoPath;
     }
 
     public int getId() {
@@ -100,5 +102,13 @@ public class Crisi {
 
     public void setElapsedTime(String elapsedTime) {
         ElapsedTime = elapsedTime;
+    }
+
+    public String getCurrentPhotoPath() {
+        return currentPhotoPath;
+    }
+
+    public void setCurrentPhotoPath(String currentPhotoPath) {
+        this.currentPhotoPath = currentPhotoPath;
     }
 }
