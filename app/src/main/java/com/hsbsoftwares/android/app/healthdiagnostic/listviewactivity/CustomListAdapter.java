@@ -2,16 +2,17 @@ package com.hsbsoftwares.android.app.healthdiagnostic.listviewactivity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hsbsoftwares.android.app.healthdiagnostic.R;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisi;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -45,6 +46,13 @@ public class CustomListAdapter extends BaseAdapter {
         return position;
     }
 
+    // Keep all Images in array
+    public String getcurrentPhotoPathList(int position) {
+        //Crisi c = crisiItems.get(getCount()-position-1);
+        Crisi c = crisiItems.get(getCount()-position-1);
+        return c.getCurrentPhotoPath();
+    }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (inflater == null)
@@ -60,28 +68,38 @@ public class CustomListAdapter extends BaseAdapter {
                 .findViewById(R.id.thumbnail);
                 */
         TextView title = (TextView) convertView.findViewById(R.id.title);
-        TextView rating = (TextView) convertView.findViewById(R.id.rating);
-        TextView genre = (TextView) convertView.findViewById(R.id.genre);
-        TextView year = (TextView) convertView.findViewById(R.id.releaseYear);
+        TextView startDate = (TextView) convertView.findViewById(R.id.startDate);
+        TextView elapsedTime = (TextView) convertView.findViewById(R.id.elapsedTime);
+        TextView endDate = (TextView) convertView.findViewById(R.id.endDate);
+        TextView country = (TextView) convertView.findViewById(R.id.country);
+        ImageView imageView = (ImageView) convertView.findViewById(R.id.thumbnail);
+        //TextView locality = (TextView) convertView.findViewById(R.id.locality);
 
         //SimpleDateFormat  sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss", Locale.getDefault());
         SimpleDateFormat  sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         // getting movie data for the row
         Crisi c = crisiItems.get(getCount()-position-1);
+        //Crisi c = crisiItems.get(position);
 
         // thumbnail image
         //thumbNail.setImageUrl(m.getThumbnailUrl(), imageLoader);
+        imageView.setImageURI(Uri.parse(c.getCurrentPhotoPath()));
+        //currentPhotoPathList.add(c.getCurrentPhotoPath());
 
         // title
-        title.setText("Crisi: " + c.getId());
+        title.setText("Crisis: " + c.getId());
+        // country and locality
+        country.setText("Country: " + c.getLocality() + ", " + c.getCountry());
+        // locality
+        //locality.setText("Locality: " + c.getLocality());
 
         // rating
         //rating.setText("Start date: " + String.valueOf(c.getStartDate()));
         try {
             Date date = sdf.parse(c.getStartDate());
             SimpleDateFormat sdfOut = new SimpleDateFormat("EEE d MMM yyyy, HH:mm:ss");
-            rating.setText("Start date: " + sdfOut.format(date));
+            startDate.setText("Start date: " + sdfOut.format(date));
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -105,7 +123,7 @@ public class CustomListAdapter extends BaseAdapter {
 
             //genre.setText("Elapsed Time: " + diff);
             //genre.setText("Elapsed Time: " + diffHours + "h" + diffMinutes + "m" + diffSeconds + "s");
-            genre.setText("Elapsed Time: " + getElapsedTime(d1, d2));
+            elapsedTime.setText("Elapsed Time: " + getElapsedTime(d1, d2));
 
             //genre.setText("Elapsed Time: " + duree);
             //genre.setText("Elapsed Time: " + heure + "h" + minute + "m" + seconde + "s");
@@ -127,8 +145,8 @@ public class CustomListAdapter extends BaseAdapter {
         //year.setText("End Date: " + String.valueOf(c.getEndDate()));
         try {
             Date date = sdf.parse(c.getEndDate());
-            SimpleDateFormat sdfOut = new SimpleDateFormat("EEE, d MMM yyyy, HH:mm:ss");
-            year.setText("End Date: " + sdfOut.format(date));
+            SimpleDateFormat sdfOut = new SimpleDateFormat("EEE d MMM yyyy, HH:mm:ss");
+            endDate.setText("End Date: " + sdfOut.format(date));
         } catch (ParseException e) {
             e.printStackTrace();
         }
