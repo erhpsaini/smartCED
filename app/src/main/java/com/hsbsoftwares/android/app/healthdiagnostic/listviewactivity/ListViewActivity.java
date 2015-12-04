@@ -4,14 +4,19 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.hsbsoftwares.android.app.healthdiagnostic.R;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisi;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.helper.DatabaseHandler;
+
+import android.widget.AdapterView.OnItemClickListener;
 
 import java.util.List;
 
@@ -45,6 +50,17 @@ public class ListViewActivity extends Activity {
             if(!crisis.isEmpty()){
                 adapter = new CustomListAdapter(this, crisis);
                 listView.setAdapter(adapter);
+                // Click event for single list row
+                listView.setOnItemClickListener(new OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        // Sending image id to FullScreenActivity
+                        Intent i = new Intent(getApplicationContext(), FullImageActivity.class);
+                        // passing array index
+                        i.putExtra("id", position);
+                        startActivity(i);
+                    }
+                });
             }
         }catch (NullPointerException e) {
             throw new IllegalStateException("Data base is empty!", e);
