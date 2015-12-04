@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_height="90dp"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="8dp" />
 
@@ -24,9 +24,9 @@
         android:textColor="@color/year"
         android:textStyle="bold" />
 
-    <!-- Rating -->
+    <!-- Rating Start date-->
     <TextView
-        android:id="@+id/rating"
+        android:id="@+id/startDate"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/title"
@@ -36,23 +36,45 @@
         android:textColor="@color/year"
         android:textSize="@dimen/rating" />
 
-    <!-- Release Year -->
+    <!-- Release Year End date-->
     <TextView
-        android:id="@+id/releaseYear"
+        android:id="@+id/endDate"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/rating"
+        android:layout_below="@id/startDate"
         android:layout_marginTop="1dip"
         android:layout_toRightOf="@+id/thumbnail"
         android:textSize="@dimen/year"
         android:textColor="@color/year"/>
-    <!-- Genre -->
+
+    <!-- Release Year Country -->
     <TextView
-        android:id="@+id/genre"
+        android:id="@+id/country"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/releaseYear"
-        android:layout_marginTop="5dp"
+        android:layout_below="@id/endDate"
+        android:layout_marginTop="1dip"
+        android:layout_toRightOf="@+id/thumbnail"
+        android:textSize="@dimen/year"
+        android:textColor="@color/year"/>
+
+    <!-- Release Year Locality -->
+    <TextView
+        android:id="@+id/locality"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/endDate"
+        android:layout_marginTop="1dip"
+        android:layout_toRightOf="@+id/country"
+        android:textSize="@dimen/year"
+        android:textColor="@color/year"/>
+    <!-- Genre Elapsed Time-->
+    <TextView
+        android:id="@+id/elapsedTime"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/country"
+        android:layout_marginTop="2dp"
         android:layout_toRightOf="@+id/thumbnail"
         android:textColor="@color/genre"
         android:textSize="@dimen/genre" />
