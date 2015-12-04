@@ -63,6 +63,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_LONGITUDE = "longitude";
     private static final String KEY_LOCALITY = "locality";
     private static final String KEY_COUNTRY = "country";
+    private static final String KEY_CURRENT_PHOTO_PATH = "currentPhotoPath";
 
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -78,7 +79,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_LATITUDE + " DOUBLE,"
                 + KEY_LONGITUDE + " DOUBLE,"
                 + KEY_LOCALITY + " TEXT,"
-                + KEY_COUNTRY + " TEXT" + ")";
+                + KEY_COUNTRY + " TEXT,"
+                + KEY_CURRENT_PHOTO_PATH + " TEXT" + ")";
         db.execSQL(CREATE_CRISIS_TABLE);
     }
 
@@ -107,6 +109,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_LONGITUDE, crisi.getLongitude()); // Longitude
         values.put(KEY_LOCALITY, crisi.getLocality()); // Locality
         values.put(KEY_COUNTRY, crisi.getCountry()); // Country
+        values.put(KEY_CURRENT_PHOTO_PATH, crisi.getCurrentPhotoPath()); // Current Photo Path
 
         // Inserting Row Async Inserting
         //AsyncTask is anonymous class
@@ -156,6 +159,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 crisi.setLongitude(Double.parseDouble(cursor.getString(4)));
                 crisi.setLocality(cursor.getString(5));
                 crisi.setCountry(cursor.getString(6));
+                crisi.setCurrentPhotoPath(cursor.getString(7));
                 // Adding crisi to list
                 crisiList.add(crisi);
             } while (cursor.moveToNext());
@@ -176,6 +180,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_LONGITUDE, crisi.getLongitude()); // Longitude
         values.put(KEY_LOCALITY, crisi.getLocality()); // Locality
         values.put(KEY_COUNTRY, crisi.getCountry()); // Country
+        values.put(KEY_CURRENT_PHOTO_PATH, crisi.getCurrentPhotoPath()); // Current Photo Path
 
         // updating row
         return db.update(TABLE_CRISIS, values, KEY_ID + " = ?",
@@ -202,6 +207,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         values.put(KEY_LONGITUDE, crisi.getLongitude()); // Longitude
         values.put(KEY_LOCALITY, locality); // Locality
         values.put(KEY_COUNTRY, country); // Country
+        values.put(KEY_CURRENT_PHOTO_PATH, crisi.getCurrentPhotoPath()); // Current Photo Path
 
         // updating row
         return db.update(TABLE_CRISIS, values, KEY_ID + " = ?",
