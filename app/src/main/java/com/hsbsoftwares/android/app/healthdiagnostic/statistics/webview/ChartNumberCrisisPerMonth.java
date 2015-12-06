@@ -45,7 +45,7 @@ public class ChartNumberCrisisPerMonth extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_cnumber_crisis_per_day);
+        setContentView(R.layout.activity_chart_number_crisis);
 
         //dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -122,7 +122,7 @@ public class ChartNumberCrisisPerMonth extends Activity implements
         html.append("google.setOnLoadCallback(drawChart);");
         html.append("function drawChart() {");
         html.append("var data = google.visualization.arrayToDataTable([");
-        html.append("['Month', 'Number Crisi'],");
+        html.append("['Month', 'Number Crisis'],");
         for (NumberCrisisPerMonth ncpm  : numberCrisisPerMonth){
             html.append("['");
             html.append(ncpm.getMonth());

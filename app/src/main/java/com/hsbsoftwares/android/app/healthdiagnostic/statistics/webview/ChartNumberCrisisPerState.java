@@ -72,7 +72,7 @@ public class ChartNumberCrisisPerState extends Activity {
         html.deleteCharAt(html.length() - 1);
         html.append("]);");
         html.append("var options = {sizeAxis: { minValue: 0, maxValue: 100 }, " +
-                "region: 'world', displayMode: 'markers', colorAxis: {colors: ['#e7711c', '#4374e0']}};");
+                "region: 'world', displayMode: 'markers', colorAxis: {colors: ['#96ab90', '#24ac00']}};");
         //html.append("var options = {};");
         html.append("var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));");
         html.append("chart.draw(data, options);");

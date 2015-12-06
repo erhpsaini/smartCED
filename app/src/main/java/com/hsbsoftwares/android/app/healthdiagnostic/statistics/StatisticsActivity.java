@@ -14,15 +14,10 @@ import com.hsbsoftwares.android.app.healthdiagnostic.statistics.webview.*;
 
 public class StatisticsActivity extends Activity {
 
-    private Button btnNumberCrisisPerDay;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_statistics);
-
-        //btnNumberCrisisPerDay = (Button)findViewById(R.id.NumberCrisisPerDay);
-
         setupActionBar();
     }
     public void openNumberCrisisPerDay(View view){
@@ -36,9 +31,6 @@ public class StatisticsActivity extends Activity {
     }
     public void openNumberCrisisPerState(View view){
         startActivity(new Intent(this, ChartNumberCrisisPerState.class));
-    }
-    public void openDailyAverage(View view){
-        startActivity(new Intent(this, ChartDailyAverage.class));
     }
 
     /**
