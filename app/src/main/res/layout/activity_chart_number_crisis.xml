@@ -43,7 +43,7 @@
         android:baselineAligned="false">
         <Button
             android:id="@+id/number_crisis"
-            android:text="Number crisis"
+            android:text="Number crisises"
             android:textSize="15dp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

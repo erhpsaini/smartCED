@@ -13,7 +13,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginRight="8dp" />
 
-    <!-- Crisi Title -->
+    <!-- Crisis Title -->
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"

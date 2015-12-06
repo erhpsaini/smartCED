@@ -11,7 +11,7 @@
         android:id="@+id/NumberCrisisPerDay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Number crisis per day"
+        android:text="Number crisises per day"
         android:onClick="openNumberCrisisPerDay"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
@@ -50,14 +50,5 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp" />
 
-    <Button
-        android:id="@+id/DailyAverage"
-        android:onClick="openDailyAverage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Daily Average"
-        android:layout_below="@+id/NumberCrisisPerState"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp" />
 
 </RelativeLayout>
