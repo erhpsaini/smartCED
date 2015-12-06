@@ -3,7 +3,7 @@ package com.hsbsoftwares.android.app.healthdiagnostic.db.model;
 /**
  * Created by Bigsony on 17/11/2015.
  */
-public class Crisi {
+public class Crisis {
     //private variables
     int id;
     String startDate;
@@ -16,10 +16,10 @@ public class Crisi {
     String currentPhotoPath;
 
     // Empty constructor
-    public Crisi() {
+    public Crisis() {
     }
 
-    public Crisi(int id, String startDate, String endDate, double latitude, double longitude, String locality, String country, String currentPhotoPath) {
+    public Crisis(int id, String startDate, String endDate, double latitude, double longitude, String locality, String country, String currentPhotoPath) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -30,7 +30,7 @@ public class Crisi {
         this.currentPhotoPath = currentPhotoPath;
     }
 
-    public Crisi(String startDate, String endDate, double latitude, double longitude, String locality, String country, String currentPhotoPath) {
+    public Crisis(String startDate, String endDate, double latitude, double longitude, String locality, String country, String currentPhotoPath) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.latitude = latitude;

@@ -12,7 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hsbsoftwares.android.app.healthdiagnostic.R;
-import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisi;
+import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisis;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -24,21 +25,21 @@ import java.util.List;
 public class CustomListAdapter extends BaseAdapter {
     private Activity activity;
     private LayoutInflater inflater;
-    private List<Crisi> crisiItems;
+    private List<Crisis> crisisItems;
 
-    public CustomListAdapter(Activity activity, List<Crisi> crisiItems) {
+    public CustomListAdapter(Activity activity, List<Crisis> crisisItems) {
         this.activity = activity;
-        this.crisiItems = crisiItems;
+        this.crisisItems = crisisItems;
     }
 
     @Override
     public int getCount() {
-        return crisiItems.size();
+        return crisisItems.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return crisiItems.get(position);
+        return crisisItems.get(position);
     }
 
     @Override
@@ -48,8 +49,8 @@ public class CustomListAdapter extends BaseAdapter {
 
     // Keep all Images in array
     public String getcurrentPhotoPathList(int position) {
-        //Crisi c = crisiItems.get(getCount()-position-1);
-        Crisi c = crisiItems.get(getCount()-position-1);
+        //Crisis c = crisisItems.get(getCount()-position-1);
+        Crisis c = crisisItems.get(getCount()-position-1);
         return c.getCurrentPhotoPath();
     }
 
@@ -79,8 +80,8 @@ public class CustomListAdapter extends BaseAdapter {
         SimpleDateFormat  sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         // getting movie data for the row
-        Crisi c = crisiItems.get(getCount()-position-1);
-        //Crisi c = crisiItems.get(position);
+        Crisis c = crisisItems.get(getCount()-position-1);
+        //Crisis c = crisisItems.get(position);
 
         // thumbnail image
         //thumbNail.setImageUrl(m.getThumbnailUrl(), imageLoader);

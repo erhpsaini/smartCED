@@ -13,7 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.hsbsoftwares.android.app.healthdiagnostic.R;
-import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisi;
+import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisis;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.helper.DatabaseHandler;
 
 import android.widget.AdapterView.OnItemClickListener;
@@ -24,7 +24,7 @@ public class ListViewActivity extends Activity {
 
     // Log tag
     private static final String TAG = ListViewActivity.class.getSimpleName();
-    private List<Crisi> crisis;
+    private List<Crisis> crisises;
     private ListView listView;
     private CustomListAdapter adapter;
     private ProgressDialog pDialog;
@@ -46,9 +46,9 @@ public class ListViewActivity extends Activity {
 
         try{
             databaseHandler = DatabaseHandler.getInstance(this);
-            crisis = databaseHandler.getAllCrisis();
-            if(!crisis.isEmpty()){
-                adapter = new CustomListAdapter(this, crisis);
+            crisises = databaseHandler.getAllCrisis();
+            if(!crisises.isEmpty()){
+                adapter = new CustomListAdapter(this, crisises);
                 listView.setAdapter(adapter);
                 // Click event for single list row
                 listView.setOnItemClickListener(new OnItemClickListener() {

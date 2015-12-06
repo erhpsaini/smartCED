@@ -12,7 +12,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisi;
+import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisis;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.DailyAverage;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.ElapsedTimes;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.MonthlyAverage;
@@ -97,19 +97,19 @@ public class DatabaseHandler extends SQLiteOpenHelper {
      * All CRUD(Create, Read, Update, Delete) Operations
      */
 
-    // Adding new crisi
-    public void addCrisi(Crisi crisi) {
-        Log.d("Add Crisi", crisi.toString());
+    // Adding new crisis
+    public void addCrisi(Crisis crisis) {
+        Log.d("Add Crisis", crisis.toString());
         //SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_START_DATE, crisi.getStartDate()); // Start Date
-        values.put(KEY_END_DATE, crisi.getEndDate()); // End Date
-        values.put(KEY_LATITUDE, crisi.getLatitude()); // Latitude
-        values.put(KEY_LONGITUDE, crisi.getLongitude()); // Longitude
-        values.put(KEY_LOCALITY, crisi.getLocality()); // Locality
-        values.put(KEY_COUNTRY, crisi.getCountry()); // Country
-        values.put(KEY_CURRENT_PHOTO_PATH, crisi.getCurrentPhotoPath()); // Current Photo Path
+        values.put(KEY_START_DATE, crisis.getStartDate()); // Start Date
+        values.put(KEY_END_DATE, crisis.getEndDate()); // End Date
+        values.put(KEY_LATITUDE, crisis.getLatitude()); // Latitude
+        values.put(KEY_LONGITUDE, crisis.getLongitude()); // Longitude
+        values.put(KEY_LOCALITY, crisis.getLocality()); // Locality
+        values.put(KEY_COUNTRY, crisis.getCountry()); // Country
+        values.put(KEY_CURRENT_PHOTO_PATH, crisis.getCurrentPhotoPath()); // Current Photo Path
 
         // Inserting Row Async Inserting
         //AsyncTask is anonymous class
@@ -138,8 +138,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
 
     // Getting All Crisis
-    public List<Crisi> getAllCrisis() {
-        List<Crisi> crisiList = new ArrayList<Crisi>();
+    public List<Crisis> getAllCrisis() {
+        List<Crisis> crisisList = new ArrayList<Crisis>();
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_CRISIS;
 
@@ -149,51 +149,51 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-                Crisi crisi = new Crisi();
-                crisi.setId(Integer.parseInt(cursor.getString(0)));
-                //crisi.setName(cursor.getString(1));
-                //crisi.setPhoneNumber(cursor.getString(2));
-                crisi.setStartDate(cursor.getString(1));
-                crisi.setEndDate(cursor.getString(2));
-                crisi.setLatitude(Double.parseDouble(cursor.getString(3)));
-                crisi.setLongitude(Double.parseDouble(cursor.getString(4)));
-                crisi.setLocality(cursor.getString(5));
-                crisi.setCountry(cursor.getString(6));
-                crisi.setCurrentPhotoPath(cursor.getString(7));
-                // Adding crisi to list
-                crisiList.add(crisi);
+                Crisis crisis = new Crisis();
+                crisis.setId(Integer.parseInt(cursor.getString(0)));
+                //crisis.setName(cursor.getString(1));
+                //crisis.setPhoneNumber(cursor.getString(2));
+                crisis.setStartDate(cursor.getString(1));
+                crisis.setEndDate(cursor.getString(2));
+                crisis.setLatitude(Double.parseDouble(cursor.getString(3)));
+                crisis.setLongitude(Double.parseDouble(cursor.getString(4)));
+                crisis.setLocality(cursor.getString(5));
+                crisis.setCountry(cursor.getString(6));
+                crisis.setCurrentPhotoPath(cursor.getString(7));
+                // Adding crisis to list
+                crisisList.add(crisis);
             } while (cursor.moveToNext());
         }
 
         // return crisi list
-        return crisiList;
+        return crisisList;
     }
 
-    // Updating single crisi
-    public int updateCrisi(Crisi crisi) {
+    // Updating single crisis
+    public int updateCrisi(Crisis crisis) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_START_DATE, crisi.getStartDate());
-        values.put(KEY_END_DATE, crisi.getEndDate());
-        values.put(KEY_LATITUDE, crisi.getLatitude()); // Latitude
-        values.put(KEY_LONGITUDE, crisi.getLongitude()); // Longitude
-        values.put(KEY_LOCALITY, crisi.getLocality()); // Locality
-        values.put(KEY_COUNTRY, crisi.getCountry()); // Country
-        values.put(KEY_CURRENT_PHOTO_PATH, crisi.getCurrentPhotoPath()); // Current Photo Path
+        values.put(KEY_START_DATE, crisis.getStartDate());
+        values.put(KEY_END_DATE, crisis.getEndDate());
+        values.put(KEY_LATITUDE, crisis.getLatitude()); // Latitude
+        values.put(KEY_LONGITUDE, crisis.getLongitude()); // Longitude
+        values.put(KEY_LOCALITY, crisis.getLocality()); // Locality
+        values.put(KEY_COUNTRY, crisis.getCountry()); // Country
+        values.put(KEY_CURRENT_PHOTO_PATH, crisis.getCurrentPhotoPath()); // Current Photo Path
 
         // updating row
         return db.update(TABLE_CRISIS, values, KEY_ID + " = ?",
-                new String[] { String.valueOf(crisi.getId()) });
+                new String[] { String.valueOf(crisis.getId()) });
     }
-    // Updating single crisi
-    public int updateCrisi2(Crisi crisi) {
+    // Updating single crisis
+    public int updateCrisi2(Crisis crisis) {
         String locality = null;
         String country = null;
         SQLiteDatabase db = this.getWritableDatabase();
 
         try {
-            address = getAddress(crisi.getLatitude(), crisi.getLongitude());
+            address = getAddress(crisis.getLatitude(), crisis.getLongitude());
             locality = address.getLocality();
             country = address.getCountryName();
         } catch (IOException e) {
@@ -201,24 +201,24 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         }
 
         ContentValues values = new ContentValues();
-        values.put(KEY_START_DATE, crisi.getStartDate());
-        values.put(KEY_END_DATE, crisi.getEndDate());
-        values.put(KEY_LATITUDE, crisi.getLatitude()); // Latitude
-        values.put(KEY_LONGITUDE, crisi.getLongitude()); // Longitude
+        values.put(KEY_START_DATE, crisis.getStartDate());
+        values.put(KEY_END_DATE, crisis.getEndDate());
+        values.put(KEY_LATITUDE, crisis.getLatitude()); // Latitude
+        values.put(KEY_LONGITUDE, crisis.getLongitude()); // Longitude
         values.put(KEY_LOCALITY, locality); // Locality
         values.put(KEY_COUNTRY, country); // Country
-        values.put(KEY_CURRENT_PHOTO_PATH, crisi.getCurrentPhotoPath()); // Current Photo Path
+        values.put(KEY_CURRENT_PHOTO_PATH, crisis.getCurrentPhotoPath()); // Current Photo Path
 
         // updating row
         return db.update(TABLE_CRISIS, values, KEY_ID + " = ?",
-                new String[] { String.valueOf(crisi.getId()) });
+                new String[] { String.valueOf(crisis.getId()) });
     }
 
-    // Deleting single crisi
-    public void deleteCrisi(Crisi crisi) {
+    // Deleting single crisis
+    public void deleteCrisi(Crisis crisis) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_CRISIS, KEY_ID + " = ?",
-                new String[]{String.valueOf(crisi.getId())});
+                new String[]{String.valueOf(crisis.getId())});
         db.close();
     }
 
@@ -262,14 +262,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<NumberCrisisPerDay> getNumberCrisisPerDay(String startDate, String endDate) {
         List<NumberCrisisPerDay> numberCrisisPerDayList = new ArrayList<NumberCrisisPerDay>();
         // Select All Query
-
-        //String selectQuery = "SELECT " + KEY_ID + ", (STRFTIME ('%s', "
-        //      + KEY_END_DATE + ") - STRFTIME ('%s', " + KEY_START_DATE + ")) AS CrisisDuration FROM " + TABLE_CRISIS;
-        //SELECT DATE(startDate) AS Days, COUNT(ID) AS NumberOfCrisis FROM crisi GROUP BY DATE(startDate)
-       //Select all crisis
-//       String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
-//                + KEY_START_DATE + ") AS Days, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
-//                + TABLE_CRISIS + " GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
 
 //        SELECT DATE(startDate) AS Days, COUNT(ID) AS NumberOfCrisis
 //        FROM crisi
@@ -345,14 +337,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         //SELECT YEAR(startDate) AS Year, COUNT(ID) AS NumberOfCrisis
         //FROM crisi
         //GROUP BY YEAR(startDate);
-        /*
-        String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
-                + KEY_START_DATE + ") AS Days, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
-                + TABLE_CRISIS + " GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
-        */
-//        String selectQuery = "SELECT STRFTIME('%Y', "
-//                + KEY_START_DATE + ") AS Year, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
-//                + TABLE_CRISIS + " GROUP BY STRFTIME('%Y'," + KEY_START_DATE + ")";
 
         String selectQuery = "SELECT STRFTIME('%Y', "
                 + KEY_START_DATE + ") AS Year, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
@@ -388,12 +372,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Address address =null;
         // Select All Query
 
-        //String selectQuery = "SELECT " + KEY_ID + ", (STRFTIME ('%s', "
-        //      + KEY_END_DATE + ") - STRFTIME ('%s', " + KEY_START_DATE + ")) AS CrisisDuration FROM " + TABLE_CRISIS;
-        //SELECT DATE(startDate) AS Days, COUNT(ID) AS NumberOfCrisis FROM crisi GROUP BY DATE(startDate)
-        //String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
-        //+ KEY_START_DATE + ") AS Days, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
-        //        + TABLE_CRISIS + " GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
         //SELECT latitude, longitude, COUNT(ID) AS NumberOfCrisis
         //FROM crisi
         //GROUP BY latitude, longitude;
@@ -415,21 +393,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 NumberCrisisPerState numberCrisisPerState = new NumberCrisisPerState();
                 numberCrisisPerState.setId(i);
                 numberCrisisPerState.setCountryName(cursor.getString(0));
-                //numberCrisisPerState.setLatitude(Double.parseDouble(cursor.getString(0)));
-                //numberCrisisPerState.setLongitude(Double.parseDouble(cursor.getString(1)));
-               /* try {
-                    address = getAddress(Double.parseDouble(cursor.getString(0)), Double.parseDouble(cursor.getString(0)));
-                    Log.d("Log: ", address.getAddressLine(0));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (NumberFormatException e) {
-                    e.printStackTrace();
-                }*/
-                //String CountryName = address.getAddressLine(0);
-                //numberCrisisPerState.setCountryName(CountryName);
-                //numberCrisisPerState.setLocality(address.getLocality());
                 numberCrisisPerState.setNumberOfCrisis(Integer.parseInt(cursor.getString(1)));
-                //numberCrisisPerState.setNumberOfCrisis(Integer.parseInt(cursor.getString(1)));
                 // Adding crisi to list
                 numberCrisisPerStateList.add(numberCrisisPerState);
                 i++;
@@ -443,17 +407,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public List<DailyAverage> getDailyAverage(String startDate, String endDate){
         List<DailyAverage> dailyAverageList = new ArrayList<>();
-
-        //SELECT DATE(`StartDate`) AS Days,
-        //SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration,
-        //COUNT(ID) AS NumberOfCrisis
-        //FROM crisi
-        //GROUP BY DATE(`StartDate`)
-//        String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
-//                + KEY_START_DATE + ") AS Days, (AVG(STRFTIME ('%s', " + KEY_END_DATE
-//                + ") - STRFTIME ('%s', " + KEY_START_DATE + ")))/60 AS AverageCrisisDuration, COUNT (" + KEY_ID
-//                + ") AS NumberOfCrisis FROM "
-//                + TABLE_CRISIS + " GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
 
 //        SELECT DATE(`StartDate`) AS Days,
 //        SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration
@@ -492,17 +445,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public List<MonthlyAverage> getMonthlyAverage(String startDate, String endDate){
         List<MonthlyAverage> monthlyAverageList = new ArrayList<>();
 
-        //SELECT DATE(`StartDate`) AS Days,
-        //SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration,
-        //COUNT(ID) AS NumberOfCrisis
-        //FROM crisi
-        //GROUP BY DATE(`StartDate`)
-//        String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
-//                + KEY_START_DATE + ") AS Days, (AVG(STRFTIME ('%s', " + KEY_END_DATE
-//                + ") - STRFTIME ('%s', " + KEY_START_DATE + ")))/60 AS AverageCrisisDuration, COUNT (" + KEY_ID
-//                + ") AS NumberOfCrisis FROM "
-//                + TABLE_CRISIS + " GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
-
 //        SELECT DATE(`StartDate`) AS Days,
 //        SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration
 //        FROM crisi
@@ -539,17 +481,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     }
     public List<YearlyAverage> getYearlyAverage(String startDate, String endDate){
         List<YearlyAverage> yearlyAverageList = new ArrayList<YearlyAverage>();
-
-        //SELECT DATE(`StartDate`) AS Days,
-        //SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration,
-        //COUNT(ID) AS NumberOfCrisis
-        //FROM crisi
-        //GROUP BY DATE(`StartDate`)
-//        String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
-//                + KEY_START_DATE + ") AS Days, (AVG(STRFTIME ('%s', " + KEY_END_DATE
-//                + ") - STRFTIME ('%s', " + KEY_START_DATE + ")))/60 AS AverageCrisisDuration, COUNT (" + KEY_ID
-//                + ") AS NumberOfCrisis FROM "
-//                + TABLE_CRISIS + " GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
 
 //        SELECT DATE(`StartDate`) AS Days,
 //        SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration

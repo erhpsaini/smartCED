@@ -11,12 +11,12 @@ import android.widget.ImageView;
 
 import com.hsbsoftwares.android.app.healthdiagnostic.R;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.helper.DatabaseHandler;
-import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisi;
+import com.hsbsoftwares.android.app.healthdiagnostic.db.model.Crisis;
 
 import java.util.List;
 
 public class FullImageActivity extends Activity {
-    private List<Crisi> crisis;
+    private List<Crisis> crisises;
     private static DatabaseHandler databaseHandler;
 
     @Override
@@ -26,14 +26,14 @@ public class FullImageActivity extends Activity {
         setupActionBar();
 
         databaseHandler = DatabaseHandler.getInstance(this);
-        crisis = databaseHandler.getAllCrisis();
+        crisises = databaseHandler.getAllCrisis();
 
         // get intent data
         Intent i = getIntent();
 
         // Selected image id
         int position = i.getExtras().getInt("id");
-        CustomListAdapter imageAdapter = new CustomListAdapter(this, crisis);
+        CustomListAdapter imageAdapter = new CustomListAdapter(this, crisises);
 
         ImageView imageView = (ImageView) findViewById(R.id.full_image_view);
         imageView.setImageURI(Uri.parse(imageAdapter.getcurrentPhotoPathList(position)));
