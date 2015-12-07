@@ -23,6 +23,7 @@ import com.hsbsoftwares.android.app.healthdiagnostic.db.model.NumberCrisisPerYea
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.YearlyAverage;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -259,8 +260,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return elapsedTimesList;
     }
 
-    public List<NumberCrisisPerDay> getNumberCrisisPerDay(String startDate, String endDate) {
+    public List<NumberCrisisPerDay> getNumberCrisisPerDay(String startDate, String endDate) throws ParseException {
         List<NumberCrisisPerDay> numberCrisisPerDayList = new ArrayList<NumberCrisisPerDay>();
+
+        SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date sdate = format1.parse(startDate);
+        Date edate = format1.parse(endDate);
+        startDate=format2.format(sdate);
+        endDate=format2.format(edate);
         // Select All Query
 
 //        SELECT DATE(startDate) AS Days, COUNT(ID) AS NumberOfCrisis
@@ -295,8 +303,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return numberCrisisPerDayList;
     }
 
-    public List<NumberCrisisPerMonth> getNumberCrisisPerMonth(String startDate, String endDate) {
+    public List<NumberCrisisPerMonth> getNumberCrisisPerMonth(String startDate, String endDate) throws ParseException {
         List<NumberCrisisPerMonth> numberCrisisPerMonthList = new ArrayList<NumberCrisisPerMonth>();
+
+        SimpleDateFormat format1 = new SimpleDateFormat("MM-yyyy");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date sdate = format1.parse(startDate);
+        Date edate = format1.parse(endDate);
+        startDate=format2.format(sdate);
+        endDate=format2.format(edate);
+
         // Select All Query
 
         //SELECT monthname(startDate) AS Month, COUNT(ID) AS NumberOfCrisis
@@ -330,18 +346,31 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return numberCrisisPerMonthList;
     }
 
-    public List<NumberCrisisPerYear> getNumberCrisisPerYear(String startDate, String endDate) {
+    public List<NumberCrisisPerYear> getNumberCrisisPerYear(String startDate, String endDate) throws ParseException {
         List<NumberCrisisPerYear> numberCrisisPerYearList = new ArrayList<NumberCrisisPerYear>();
+
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date sdate = format1.parse(startDate);
+        Date edate = format1.parse(endDate);
+        startDate=format2.format(sdate);
+        endDate=format2.format(edate);
+
         // Select All Query
 
         //SELECT YEAR(startDate) AS Year, COUNT(ID) AS NumberOfCrisis
         //FROM crisi
         //GROUP BY YEAR(startDate);
 
+//        String selectQuery = "SELECT STRFTIME('%Y', "
+//                + KEY_START_DATE + ") AS Year, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
+//                + TABLE_CRISIS + " WHERE STRFTIME('%Y', " + KEY_START_DATE + ") >= STRFTIME('%Y-%m-%d', '" + startDate
+//                + "') AND STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") <= STRFTIME('%Y-%m-%d', '" + endDate
+//                + "') GROUP BY STRFTIME('%Y'," + KEY_START_DATE + ")";
         String selectQuery = "SELECT STRFTIME('%Y', "
                 + KEY_START_DATE + ") AS Year, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
-                + TABLE_CRISIS + " WHERE STRFTIME('%Y', " + KEY_START_DATE + ") >= STRFTIME('%Y-%m-%d', '" + startDate
-                + "') AND STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") <= STRFTIME('%Y-%m-%d', '" + endDate
+                + TABLE_CRISIS + " WHERE STRFTIME('%Y', " + KEY_START_DATE + ") >= STRFTIME('%Y', '" + startDate
+                + "') AND STRFTIME('%Y', " + KEY_START_DATE + ") <= STRFTIME('%Y', '" + endDate
                 + "') GROUP BY STRFTIME('%Y'," + KEY_START_DATE + ")";
 
 
@@ -405,8 +434,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         return numberCrisisPerStateList;
     }
 
-    public List<DailyAverage> getDailyAverage(String startDate, String endDate){
+    public List<DailyAverage> getDailyAverage(String startDate, String endDate) throws ParseException {
         List<DailyAverage> dailyAverageList = new ArrayList<>();
+
+        SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date sdate = format1.parse(startDate);
+        Date edate = format1.parse(endDate);
+        startDate=format2.format(sdate);
+        endDate=format2.format(edate);
 
 //        SELECT DATE(`StartDate`) AS Days,
 //        SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration
@@ -442,8 +478,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // return crisi list
         return dailyAverageList;
     }
-    public List<MonthlyAverage> getMonthlyAverage(String startDate, String endDate){
+    public List<MonthlyAverage> getMonthlyAverage(String startDate, String endDate) throws ParseException {
         List<MonthlyAverage> monthlyAverageList = new ArrayList<>();
+
+        SimpleDateFormat format1 = new SimpleDateFormat("MM-yyyy");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date sdate = format1.parse(startDate);
+        Date edate = format1.parse(endDate);
+        startDate=format2.format(sdate);
+        endDate=format2.format(edate);
 
 //        SELECT DATE(`StartDate`) AS Days,
 //        SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration
@@ -479,8 +522,15 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // return crisi list
         return monthlyAverageList;
     }
-    public List<YearlyAverage> getYearlyAverage(String startDate, String endDate){
+    public List<YearlyAverage> getYearlyAverage(String startDate, String endDate) throws ParseException {
         List<YearlyAverage> yearlyAverageList = new ArrayList<YearlyAverage>();
+
+        SimpleDateFormat format1 = new SimpleDateFormat("yyyy");
+        SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
+        Date sdate = format1.parse(startDate);
+        Date edate = format1.parse(endDate);
+        startDate=format2.format(sdate);
+        endDate=format2.format(edate);
 
 //        SELECT DATE(`StartDate`) AS Days,
 //        SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration

@@ -22,8 +22,10 @@ import com.hsbsoftwares.android.app.healthdiagnostic.db.model.NumberCrisisPerDay
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.NumberCrisisPerYear;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.YearlyAverage;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -50,7 +52,8 @@ public class ChartNumberCrisisPerYear extends Activity implements
         setContentView(R.layout.activity_chart_number_crisis);
 
         //dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        //dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        dateFormatter = new SimpleDateFormat("yyyy", Locale.getDefault());
 
         findViewsById();
 
@@ -66,7 +69,18 @@ public class ChartNumberCrisisPerYear extends Activity implements
 
     private void loadChartAverageDuration(String startDate, String endDate){
         databaseHandler = DatabaseHandler.getInstance(this);
-        List<YearlyAverage> yearlyAverage = databaseHandler.getYearlyAverage(startDate, endDate);
+        List<YearlyAverage> yearlyAverage = null;
+        try {
+            yearlyAverage = databaseHandler.getYearlyAverage(startDate, endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        for(YearlyAverage ya : yearlyAverage){
+            String log = "Id: " + ya.getId() + " Year: " + ya.getYear()
+                    + " Average Duration: " + ya.getAverageCrisisDuration();
+            Log.d("Name: ", log);
+        }
 
         StringBuilder html = new StringBuilder();
 
@@ -107,7 +121,20 @@ public class ChartNumberCrisisPerYear extends Activity implements
     }
     private void loadChartNumberCrisis(String startDate, String endDate){
         databaseHandler = DatabaseHandler.getInstance(this);
-        List<NumberCrisisPerYear> numberCrisisPerYear = databaseHandler.getNumberCrisisPerYear(startDate, endDate);
+        List<NumberCrisisPerYear> numberCrisisPerYear = null;
+        try {
+            numberCrisisPerYear = databaseHandler.getNumberCrisisPerYear(startDate, endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+
+        for(NumberCrisisPerYear ncpy : numberCrisisPerYear){
+            String log = "Id: " + ncpy.getId() + " Year: " + ncpy.getyear()
+                    + " Number Of Crisis: " + ncpy.getNumberOfCrisis();
+            Log.d("Name: ", log);
+        }
+
 
         StringBuilder html = new StringBuilder();
 
@@ -124,6 +151,7 @@ public class ChartNumberCrisisPerYear extends Activity implements
         html.append("['Year', 'Number Crisis'],");
         for (NumberCrisisPerYear ncpy  : numberCrisisPerYear){
             html.append("['");
+            //html.append(String.valueOf(ncpy.getyear()));
             html.append(ncpy.getyear());
             html.append("', ");
             html.append(ncpy.getNumberOfCrisis());
@@ -210,14 +238,11 @@ public class ChartNumberCrisisPerYear extends Activity implements
     }
 
     public void onClick(View view) {
-        SimpleDateFormat  sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        //SimpleDateFormat  sdfOut = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         if(view == fromDateEtxt) {
             fromDatePickerDialog.show();
-            //Log.d("Click", String.format("fromDateEtxt: %s", sdf.format(fromDateEtxt.getText().toString().trim())));
-            Log.d("Click", "fromDateEtxt: " + fromDateEtxt.getText().toString().trim());
         } else if(view == toDateEtxt) {
             toDatePickerDialog.show();
-            Log.d("Click", "toDateEtxt: " + toDateEtxt.getText().toString().trim());
         } else if(view == NumberCrisis) {
             //toDatePickerDialog.show();
             loadChartNumberCrisis(fromDateEtxt.getText().toString().trim(), toDateEtxt.getText().toString().trim());

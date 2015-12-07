@@ -20,6 +20,7 @@ import com.hsbsoftwares.android.app.healthdiagnostic.db.helper.DatabaseHandler;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.DailyAverage;
 import com.hsbsoftwares.android.app.healthdiagnostic.db.model.NumberCrisisPerDay;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
@@ -47,8 +48,8 @@ public class ChartNumberCrisisPerDay extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chart_number_crisis);
 
-        //dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        //dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
         findViewsById();
 
@@ -67,7 +68,12 @@ public class ChartNumberCrisisPerDay extends Activity implements
 
     private void loadChartAverageDuration(String startDate, String endDate){
         databaseHandler = DatabaseHandler.getInstance(this);
-        List<DailyAverage> dailyAverage = databaseHandler.getDailyAverage(startDate, endDate);
+        List<DailyAverage> dailyAverage = null;
+        try {
+            dailyAverage = databaseHandler.getDailyAverage(startDate, endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         StringBuilder html = new StringBuilder();
 
@@ -106,7 +112,12 @@ public class ChartNumberCrisisPerDay extends Activity implements
     }
     private void loadChartNumberCrisis(String startDate, String endDate){
         databaseHandler = DatabaseHandler.getInstance(this);
-        List<NumberCrisisPerDay> numberCrisisPerDay = databaseHandler.getNumberCrisisPerDay(startDate, endDate);
+        List<NumberCrisisPerDay> numberCrisisPerDay = null;
+        try {
+            numberCrisisPerDay = databaseHandler.getNumberCrisisPerDay(startDate, endDate);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         StringBuilder html = new StringBuilder();
 
