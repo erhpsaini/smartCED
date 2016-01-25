@@ -8,6 +8,8 @@ import android.location.Geocoder;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.Window;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -30,7 +32,12 @@ public class ChartNumberCrisisPerState extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Adds Progrss bar Support
+        this.getWindow().requestFeature(Window.FEATURE_PROGRESS);
         setContentView(R.layout.activity_webview);
+
+        // Makes Progress bar Visible
+        getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
 
         webView = (WebView)findViewById(R.id.web);
         webView.getSettings().setJavaScriptEnabled(true);
@@ -40,6 +47,21 @@ public class ChartNumberCrisisPerState extends Activity {
 
         webView.loadDataWithBaseURL("file:///android_asset/", buildHtml().toString(), "text/html", "UTF-8", "");
         webView.requestFocusFromTouch();
+
+        // Sets the Chrome Client, and defines the onProgressChanged
+        // This makes the Progress bar be updated.
+        final Activity MyActivity = this;
+        webView.setWebChromeClient(new WebChromeClient() {
+            public void onProgressChanged(WebView view, int progress) {
+                //Make the bar disappear after URL is loaded, and changes string to Loading...
+                MyActivity.setTitle("Loading...");
+                MyActivity.setProgress(progress * 100); //Make the bar disappear after URL is loaded
+
+                // Return the app name after finish loading
+                if (progress == 100)
+                    MyActivity.setTitle(R.string.app_name);
+            }
+        });
         setupActionBar();
     }
 

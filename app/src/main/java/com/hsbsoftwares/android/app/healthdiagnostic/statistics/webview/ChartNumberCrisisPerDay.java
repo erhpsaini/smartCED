@@ -9,6 +9,8 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
@@ -46,7 +48,12 @@ public class ChartNumberCrisisPerDay extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Adds Progrss bar Support
+        this.getWindow().requestFeature(Window.FEATURE_PROGRESS);
         setContentView(R.layout.activity_chart_number_crisis);
+
+        // Makes Progress bar Visible
+        getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
 
         dateFormatter = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         //dateFormatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -60,9 +67,20 @@ public class ChartNumberCrisisPerDay extends Activity implements
         WebSettings webSettings = webView.getSettings();
         webSettings.setBuiltInZoomControls(true);
 
+        // Sets the Chrome Client, and defines the onProgressChanged
+        // This makes the Progress bar be updated.
+        final Activity MyActivity = this;
+        webView.setWebChromeClient(new WebChromeClient() {
+            public void onProgressChanged(WebView view, int progress) {
+                //Make the bar disappear after URL is loaded, and changes string to Loading...
+                MyActivity.setTitle("Loading...");
+                MyActivity.setProgress(progress * 100); //Make the bar disappear after URL is loaded
 
-
-
+                // Return the app name after finish loading
+                if (progress == 100)
+                    MyActivity.setTitle(R.string.app_name);
+            }
+        });
         setupActionBar();
     }
 
@@ -77,38 +95,54 @@ public class ChartNumberCrisisPerDay extends Activity implements
 
         StringBuilder html = new StringBuilder();
 
-        html.append("<html>");
-        html.append("<head>");
-        html.append("<link rel=\"stylesheet\" href=\"assets/css/main.css\" />");
-        html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
-        html.append("<script type=\"text/javascript\">");
+        if (dailyAverage.isEmpty()){
+            html.append("<html>");
+            html.append("<head>");
+            html.append("<link rel=\"stylesheet\" href=\"css/main.css\" />");
+            html.append("</head>");
+            html.append("<body>");
+            html.append("<p>No data!</br>Try another date</p>");
+            html.append("</body></html>");
 
-        html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
-        html.append("google.setOnLoadCallback(drawChart);");
-        html.append("function drawChart() {");
-        html.append("var data = google.visualization.arrayToDataTable([");
-        html.append("['Day', 'AverageCrisisduration'],");
-        for (DailyAverage da : dailyAverage){
-            html.append("['");
-            html.append(da.getDays());
-            html.append("', ");
-            html.append(da.getAverageCrisisDuration());
-            html.append("],");
+
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
         }
-        html.deleteCharAt(html.length() - 1);
-        html.append("]);");
-        html.append("var options = {title: 'Daily Average', hAxis: {title: 'Day',  titleTextStyle: {color: '#333'}}, vAxis: {title: 'Time in minute',  titleTextStyle: {color: '#333'}, minValue: 0}};");
-        html.append("var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));");
-        html.append("chart.draw(data, options);");
-        html.append("}</script>");
-        html.append("</head>");
-        html.append("<body>");
-        html.append("<div id=\"chart_div\" style=\"width: 600px; height: 320px;\"></div>");
-        html.append("</body></html>");
+        else {
+            html.append("<html>");
+            html.append("<head>");
+            html.append("<link rel=\"stylesheet\" href=\"css/main.css\" />");
+            html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
+            html.append("<script type=\"text/javascript\">");
+
+            html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
+            html.append("google.setOnLoadCallback(drawChart);");
+            html.append("function drawChart() {");
+            html.append("var data = google.visualization.arrayToDataTable([");
+            html.append("['Day', 'AverageCrisisduration'],");
+            for (DailyAverage da : dailyAverage){
+                html.append("['");
+                html.append(da.getDays());
+                html.append("', ");
+                html.append(da.getAverageCrisisDuration());
+                html.append("],");
+            }
+            html.deleteCharAt(html.length() - 1);
+            html.append("]);");
+            html.append("var options = {title: 'Daily Average', legend: { position: 'none' }, hAxis: {title: 'Day',  titleTextStyle: {color: '#333'}}, vAxis: {title: 'Time in minute',  titleTextStyle: {color: '#333'}, minValue: 0}};");
+            html.append("var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));");
+            html.append("chart.draw(data, options);");
+            html.append("}</script>");
+            html.append("</head>");
+            html.append("<body>");
+            html.append("<div id=\"chart_div\" style=\"width: 600px; height: 320px;\"></div>");
+            html.append("</body></html>");
 
 
-        webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
-        webView.requestFocusFromTouch();
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }
+
     }
     private void loadChartNumberCrisis(String startDate, String endDate){
         databaseHandler = DatabaseHandler.getInstance(this);
@@ -121,39 +155,55 @@ public class ChartNumberCrisisPerDay extends Activity implements
 
         StringBuilder html = new StringBuilder();
 
-        html.append("<html>");
-        html.append("<head>");
-        html.append("<link rel=\"stylesheet\" href=\"assets/css/main.css\" />");
-        html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
-        html.append("<script type=\"text/javascript\">");
+        if (numberCrisisPerDay.isEmpty()){
 
-        html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
-        html.append("google.setOnLoadCallback(drawChart);");
-        html.append("function drawChart() {");
-        html.append("var data = google.visualization.arrayToDataTable([");
-        html.append("['Day', 'Number Crisis'],");
-        for (NumberCrisisPerDay ncpd  : numberCrisisPerDay){
-            html.append("['");
-            html.append(ncpd.getDays());
-            html.append("', ");
-            html.append(ncpd.getNumberOfCrisis());
-            html.append("],");
+            html.append("<html>");
+            html.append("<head>");
+            html.append("<link rel=\"stylesheet\" href=\"css/main.css\" />");
+            html.append("</head>");
+            html.append("<body>");
+            html.append("<p>No data!</br>Try another date</p>");
+            html.append("</body></html>");
+
+
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
         }
-        html.deleteCharAt(html.length() - 1);
-        html.append("]);");
-        html.append(" var options = {title: 'Number of Daily Crisis', 'width':450, 'height':250, " +
-                "hAxis: {title: 'Day',  titleTextStyle: {color: '#333'}}, " +
-                "vAxis: {title: 'Number of crisis',  titleTextStyle: {color: '#333'}, minValue: 0}};");
-        html.append("var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));");
-        html.append("chart.draw(data, options);");
-        html.append("}</script>");
-        html.append("</head>");
-        html.append("<body>");
-        html.append("<div id='chart_div'></div>");
-        html.append("</body></html>");
+        else {
+            html.append("<html>");
+            html.append("<head>");
+            html.append("<link rel=\"stylesheet\" href=\"assets/css/main.css\" />");
+            html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
+            html.append("<script type=\"text/javascript\">");
 
-        webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
-        webView.requestFocusFromTouch();
+            html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
+            html.append("google.setOnLoadCallback(drawChart);");
+            html.append("function drawChart() {");
+            html.append("var data = google.visualization.arrayToDataTable([");
+            html.append("['Day', 'Number Crisis'],");
+            for (NumberCrisisPerDay ncpd  : numberCrisisPerDay){
+                html.append("['");
+                html.append(ncpd.getDays());
+                html.append("', ");
+                html.append(ncpd.getNumberOfCrisis());
+                html.append("],");
+            }
+            html.deleteCharAt(html.length() - 1);
+            html.append("]);");
+            html.append(" var options = {title: 'Number of Daily Crisis', legend: { position: 'none' }, 'width':600, 'height':320, " +
+                    "hAxis: {title: 'Day',  titleTextStyle: {color: '#333'}}, " +
+                    "vAxis: {title: 'Number of crisis',  titleTextStyle: {color: '#333'}, minValue: 0}};");
+            html.append("var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));");
+            html.append("chart.draw(data, options);");
+            html.append("}</script>");
+            html.append("</head>");
+            html.append("<body>");
+            html.append("<div id='chart_div'></div>");
+            html.append("</body></html>");
+
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }
     }
 
     /**
