@@ -17,6 +17,8 @@ public class PathologyProcessingTask extends AsyncTask<ArrayList<Integer>, Void,
 
     private static Context mContext;
 
+    private static int isInit = 0;
+
     //For emergency alarm
     private IEmergencyAlarmListener mEmergencyAlarmListener;
 
@@ -59,10 +61,20 @@ public class PathologyProcessingTask extends AsyncTask<ArrayList<Integer>, Void,
         Log.d(TAG, "Executing onPostExecute...");
         //If the native call detects the crisis and if the listener is set
         //listener is notified so the callback is triggered!
+        if (isEmergency == 1 && isInit == 0 && mEmergencyAlarmListener != null){
+            mEmergencyAlarmListener.onInit();
+            isInit = 1;
+            Log.i(TAG, "onInit...prima isInit = 0");
+        }
+        if (isEmergency == 0 && isInit == 1){
+            mEmergencyAlarmListener.onStopEmergency();
+            isInit = 0;
+            Log.i(TAG, "isInit...prima isInit = 1");
+        }
         if(isEmergency == 1 && mEmergencyAlarmListener != null){
             mEmergencyAlarmListener.onEmergency();
         }
-        Log.d(TAG, "Done with task. Return value: " + isEmergency);
+        Log.i(TAG, "Done with task. Return value: isEmergency: " + isEmergency + ", isInit: " + isInit);
     }
 
     //Listener setter

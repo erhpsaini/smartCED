@@ -5,5 +5,7 @@ package com.hsbsoftwares.android.app.healthdiagnostic;
 public interface IEmergencyAlarmListener {
 
     //Callback method that will be triggered on emergency occurred
-    public void onEmergency();
+    void onEmergency();
+    void onInit();
+    void onStopEmergency();
 }
