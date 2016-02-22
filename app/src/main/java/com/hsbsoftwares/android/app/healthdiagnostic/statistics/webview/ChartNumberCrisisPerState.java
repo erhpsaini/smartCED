@@ -101,7 +101,7 @@ public class ChartNumberCrisisPerState extends Activity {
         html.append("}</script>");
         html.append("</head>");
         html.append("<body>");
-        html.append("<div id=\"chart_div\" style=\"width: 900px; height: 500px;\"></div>");
+        html.append("<div id=\"chart_div\" style=\"width: 450px; height: 250px;\"></div>");
         html.append("</body></html>");
 
         return html;

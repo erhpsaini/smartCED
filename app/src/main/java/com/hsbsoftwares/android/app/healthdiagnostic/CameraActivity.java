@@ -244,44 +244,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
-//            List<Crisis> crisis = databaseHandler.getAllCrisis();
-//            for (Crisis cn : crisis) {
-//                String log = "Id: "+cn.getId()+", Date start: " + cn.getStartDate() + ", Date end: "
-//                        + cn.getEndDate() + ", latitude: " + cn.getLatitude() + ", longitude: " + cn.getLongitude()
-//                        + ", Locality: " + cn.getLocality()+ ", Country: " + cn.getCountry();
-//                // Writing Contacts to log
-//                Log.d("Name ", log);
-//
-//            }
-
-
-            /*
-            try {
-                //Locality = gps.getAddress();
-                locality = getAddress(latitude, longitude).getLocality();
-                countryCode = getAddress(latitude, longitude).getCountryCode();
-                countryName = getAddress(latitude, longitude).getCountryName();
-                thoroughfare = getAddress(latitude,longitude).getThoroughfare();
-                featureName = getAddress(latitude, longitude).getAdminArea();
-                AdminArea = getAddress(latitude, longitude).getAdminArea();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-
-            // \n is for new line
-            // + "\nLocality" + Locality + "\nCountry code: " + CountryCode + "\nCountry name: " + CountryName
-            /*
-            Toast.makeText(getApplicationContext(),
-                    "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nThoroughfare: " + thoroughfare + "\nLocality: " + locality +
-                            "\nCountry name: " + countryName + "\nCountry code: " + countryCode + "\nFeatureName: " + featureName + "\nAdminArea: " + AdminArea,
-                    Toast.LENGTH_LONG).show();
-            msg = "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nThoroughfare: " + thoroughfare + "\nLocality: " + locality +
-                    "\nCountry name: " + countryName + "\nCountry code: " + countryCode + "\nFeatureName: " + featureName + "\nAdminArea: " + AdminArea;
-            Log.i(TAG, msg);
-            */
             Toast.makeText(getApplicationContext(),
                     "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nLocality: " + locality + "\nCountry: " + country,
                     Toast.LENGTH_LONG).show();
@@ -444,6 +406,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         //Disabling camera view and releasing camera (important!!)
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
+        if(gps.canGetLocation())
+            gps.stopUsingGPS();
     }
 
     public void onCameraViewStarted(int width, int height) {
@@ -1024,9 +988,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        VideoCapture video = new VideoCapture();
-//        video.read(inputFrame);
-        //return currentGrayFrame;
+        //VideoCapture video = new VideoCapture();
+        //video.read(inputFrame);
+        // return currentGrayFrame;
     }
     private File createImageFile() throws IOException {
         // Create an image file name

@@ -133,7 +133,7 @@ public class ChartNumberCrisisPerYear extends Activity implements
         html.append("}</script>");
         html.append("</head>");
         html.append("<body>");
-        html.append("<div id=\"chart_div\" style=\"width: 600px; height: 320px;\"></div>");
+        html.append("<div id=\"chart_div\" style=\"width: 300px; height: 220px;\"></div>");
         html.append("</body></html>");
 
 
@@ -180,7 +180,7 @@ public class ChartNumberCrisisPerYear extends Activity implements
         }
         html.deleteCharAt(html.length() - 1);
         html.append("]);");
-        html.append(" var options = {title: 'Number of Yearly Crisis', legend: { position: 'none' }, 'width':450, 'height':250, " +
+        html.append(" var options = {title: 'Number of Yearly Crisis', legend: { position: 'none' }, 'width':300, 'height':220, " +
                 "hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}}, " +
                 "vAxis: {title: 'Number of crisis',  titleTextStyle: {color: '#333'}, minValue: 0}};");
         html.append("var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));");

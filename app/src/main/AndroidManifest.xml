@@ -40,13 +40,13 @@
         </activity>
         <activity android:name=".statistics.StatisticsActivity" >
         </activity>
+        <activity android:name=".statistics.webview.ChartNumberCrisisPerDay" >
+        </activity>
         <activity android:name=".statistics.webview.ChartNumberCrisisPerMonth" >
         </activity>
         <activity android:name=".statistics.webview.ChartNumberCrisisPerYear" >
         </activity>
         <activity android:name=".statistics.webview.ChartNumberCrisisPerState" >
-        </activity>
-        <activity android:name=".statistics.webview.CNumberCrisisPerDay" >
         </activity>
         <activity android:name=".listviewactivity.FullImageActivity" >
         </activity>

@@ -92,7 +92,6 @@ public class ChartNumberCrisisPerDay extends Activity implements
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         StringBuilder html = new StringBuilder();
 
         if (dailyAverage.isEmpty()){
@@ -103,8 +102,6 @@ public class ChartNumberCrisisPerDay extends Activity implements
             html.append("<body>");
             html.append("<p>No data!</br>Try another date</p>");
             html.append("</body></html>");
-
-
             webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
             webView.requestFocusFromTouch();
         }
@@ -135,14 +132,11 @@ public class ChartNumberCrisisPerDay extends Activity implements
             html.append("}</script>");
             html.append("</head>");
             html.append("<body>");
-            html.append("<div id=\"chart_div\" style=\"width: 600px; height: 320px;\"></div>");
+            html.append("<div id=\"chart_div\" style=\"width: 300px; height: 220px;\"></div>");
             html.append("</body></html>");
-
-
             webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
             webView.requestFocusFromTouch();
         }
-
     }
     private void loadChartNumberCrisis(String startDate, String endDate){
         databaseHandler = DatabaseHandler.getInstance(this);
@@ -190,7 +184,8 @@ public class ChartNumberCrisisPerDay extends Activity implements
             }
             html.deleteCharAt(html.length() - 1);
             html.append("]);");
-            html.append(" var options = {title: 'Number of Daily Crisis', legend: { position: 'none' }, 'width':600, 'height':320, " +
+            html.append(" var options = {title: 'Number of Daily Crisis', legend: " +
+                    "{ position: 'none' }, 'width':300, 'height':220, " +
                     "hAxis: {title: 'Day',  titleTextStyle: {color: '#333'}}, " +
                     "vAxis: {title: 'Number of crisis',  titleTextStyle: {color: '#333'}, minValue: 0}};");
             html.append("var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));");
@@ -200,7 +195,6 @@ public class ChartNumberCrisisPerDay extends Activity implements
             html.append("<body>");
             html.append("<div id='chart_div'></div>");
             html.append("</body></html>");
-
             webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
             webView.requestFocusFromTouch();
         }
