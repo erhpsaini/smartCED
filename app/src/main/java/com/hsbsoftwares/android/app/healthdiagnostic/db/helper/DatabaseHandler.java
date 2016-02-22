@@ -286,7 +286,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         db.close();
-        // return crisi list
+        // return crisis list
         return numberCrisisPerDayList;
     }
 
