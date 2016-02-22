@@ -89,7 +89,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CRISIS);
-
         // Create tables again
         onCreate(db);
     }
@@ -101,8 +100,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     // Adding new crisis
     public void addCrisi(Crisis crisis) {
         Log.d("Add Crisis", crisis.toString());
-        //SQLiteDatabase db = this.getWritableDatabase();
-
         ContentValues values = new ContentValues();
         values.put(KEY_START_DATE, crisis.getStartDate()); // Start Date
         values.put(KEY_END_DATE, crisis.getEndDate()); // End Date
@@ -117,7 +114,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         new AsyncTask<ContentValues, Void, Void>() {
             @Override
             protected Void doInBackground(ContentValues... params) {
-
                 // 1. get reference to writable DB
                 SQLiteDatabase db = DatabaseHandler.this.getWritableDatabase();
 
@@ -128,14 +124,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 db.close();
                 return null;
             }
-
             protected void onPostExecute(){
                 Log.d(TAG, "Executing onPostExecute...");
                 Toast.makeText(mContext, "Save.", Toast.LENGTH_LONG);
             }
         }.execute(values);
-        //db.insert(TABLE_CRISIS, null, values);
-        //db.close(); // Closing database connection
     }
 
     // Getting All Crisis
@@ -152,8 +145,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             do {
                 Crisis crisis = new Crisis();
                 crisis.setId(Integer.parseInt(cursor.getString(0)));
-                //crisis.setName(cursor.getString(1));
-                //crisis.setPhoneNumber(cursor.getString(2));
                 crisis.setStartDate(cursor.getString(1));
                 crisis.setEndDate(cursor.getString(2));
                 crisis.setLatitude(Double.parseDouble(cursor.getString(3)));
@@ -262,7 +253,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public List<NumberCrisisPerDay> getNumberCrisisPerDay(String startDate, String endDate) throws ParseException {
         List<NumberCrisisPerDay> numberCrisisPerDayList = new ArrayList<NumberCrisisPerDay>();
-
         SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
         SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
         Date sdate = format1.parse(startDate);
@@ -270,20 +260,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         startDate=format2.format(sdate);
         endDate=format2.format(edate);
         // Select All Query
-
-//        SELECT DATE(startDate) AS Days, COUNT(ID) AS NumberOfCrisis
-//        FROM crisi
+//        SELECT DATE(startDate) AS Days, COUNT(ID) AS NumberOfCrisis FROM crisi
 //        WHERE DATE(`StartDate`) >= '2015-11-06' AND DATE(`StartDate`) <= '2014-11-12'
 //        GROUP BY DATE(startDate);
         String selectQuery = "SELECT STRFTIME('%Y-%m-%d', "
                 + KEY_START_DATE + ") AS Days, COUNT (" + KEY_ID + ") AS NumberOfCrisis FROM "
-                + TABLE_CRISIS + " WHERE STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") >= STRFTIME('%Y-%m-%d', '" + startDate
-                + "') AND STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") <= STRFTIME('%Y-%m-%d', '" + endDate
+                + TABLE_CRISIS + " WHERE STRFTIME('%Y-%m-%d', " + KEY_START_DATE
+                + ") >= STRFTIME('%Y-%m-%d', '" + startDate
+                + "') AND STRFTIME('%Y-%m-%d', " + KEY_START_DATE
+                + ") <= STRFTIME('%Y-%m-%d', '" + endDate
                 + "') GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
-
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
-
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             int i=1;
@@ -298,7 +286,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         db.close();
-
         // return crisi list
         return numberCrisisPerDayList;
     }
@@ -436,14 +423,12 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     public List<DailyAverage> getDailyAverage(String startDate, String endDate) throws ParseException {
         List<DailyAverage> dailyAverageList = new ArrayList<>();
-
         SimpleDateFormat format1 = new SimpleDateFormat("dd-MM-yyyy");
         SimpleDateFormat format2 = new SimpleDateFormat("yyyy-MM-dd");
         Date sdate = format1.parse(startDate);
         Date edate = format1.parse(endDate);
         startDate=format2.format(sdate);
         endDate=format2.format(edate);
-
 //        SELECT DATE(`StartDate`) AS Days,
 //        SEC_TO_TIME(AVG(TIMEDIFF(EndDate, StartDate))) AS AverageCrisisDuration
 //        FROM crisi
@@ -456,7 +441,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + TABLE_CRISIS + " WHERE STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") >= STRFTIME('%Y-%m-%d', '" + startDate
                 + "') AND STRFTIME('%Y-%m-%d', " + KEY_START_DATE + ") <= STRFTIME('%Y-%m-%d', '" + endDate
                 + "') GROUP BY STRFTIME('%Y-%m-%d'," + KEY_START_DATE + ")";
-
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
