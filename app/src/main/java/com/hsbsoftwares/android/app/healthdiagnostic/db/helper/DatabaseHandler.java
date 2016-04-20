@@ -66,11 +66,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
     private static final String KEY_COUNTRY = "country";
     private static final String KEY_CURRENT_PHOTO_PATH = "currentPhotoPath";
 
+    // Constructor
     public DatabaseHandler(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
         mContext = context;
     }
-
     // Creating Tables
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CRISIS_TABLE = "CREATE TABLE " + TABLE_CRISIS + "("
@@ -84,7 +84,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_CURRENT_PHOTO_PATH + " TEXT" + ")";
         db.execSQL(CREATE_CRISIS_TABLE);
     }
-
     // Upgrading database
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Drop older table if existed
@@ -92,7 +91,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         // Create tables again
         onCreate(db);
     }
-
     /**
      * All CRUD(Create, Read, Update, Delete) Operations
      */
@@ -220,7 +218,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         cursor.close();
-
         // return count
         return cursor.getCount();
     }

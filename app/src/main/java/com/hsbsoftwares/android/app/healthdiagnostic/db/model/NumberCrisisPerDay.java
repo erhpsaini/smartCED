@@ -19,7 +19,6 @@ public class NumberCrisisPerDay {
         this.days = days;
         this.numberOfCrisis = numberOfCrisis;
     }
-
     public int getId() {
         return id;
     }
