@@ -49,7 +49,6 @@ public class CustomListAdapter extends BaseAdapter {
 
     // Keep all Images in array
     public String getcurrentPhotoPathList(int position) {
-        //Crisis c = crisisItems.get(getCount()-position-1);
         Crisis c = crisisItems.get(getCount()-position-1);
         return c.getCurrentPhotoPath();
     }
@@ -109,18 +108,17 @@ public class CustomListAdapter extends BaseAdapter {
         Date d1 = null;
         Date d2 = null;
         try {
-
             d1 = sdf.parse(c.getStartDate());
             d2 = sdf.parse(c.getEndDate());
 
             //in milliseconds
-            long diff = d2.getTime() - d1.getTime();
-
-            long diffSeconds = diff / 1000 % 60;
-            long diffMinutes = diff / (60 * 1000) % 60;
-            long diffHours = diff / (60 * 60 * 1000) % 24;
-            long diffDays = diff / (24 * 60 * 60 * 1000);
-            Log.i("CustomListAdapter ", "Elapsed Time: d1=" + d1 + " d2=" + d2 + " diff =" + diff);
+//            long diff = d2.getTime() - d1.getTime();
+//
+//            long diffSeconds = diff / 1000 % 60;
+//            long diffMinutes = diff / (60 * 1000) % 60;
+//            long diffHours = diff / (60 * 60 * 1000) % 24;
+//            long diffDays = diff / (24 * 60 * 60 * 1000);
+//            Log.i("CustomListAdapter ", "Elapsed Time: d1=" + d1 + " d2=" + d2 + " diff =" + diff);
 
             //genre.setText("Elapsed Time: " + diff);
             //genre.setText("Elapsed Time: " + diffHours + "h" + diffMinutes + "m" + diffSeconds + "s");

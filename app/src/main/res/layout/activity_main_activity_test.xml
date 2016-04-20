@@ -25,18 +25,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/button1"
-                    android:text="Number crisis per day"
+                    android:text="Camera"
                     android:textSize="18sp"
                     android:gravity="center|bottom"
                     android:singleLine="false"
-                    android:onClick="openNumberCrisisPerDay"
+                    android:onClick="openCameraActivity"
                     android:stateListAnimator="@null"
                     android:paddingBottom="10dp"/>
                 <ImageView
                     android:id="@+id/CameraActivity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_action_today_80"
+                    android:src="@drawable/ic_image_camera_alt"
                     android:elevation="2dp"
                     android:layout_centerInParent="true"/>
             </RelativeLayout>
@@ -48,18 +48,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/button2"
-                    android:text="Number Crisis Per Month"
+                    android:text="Crisis"
                     android:textSize="18sp"
                     android:gravity="center|bottom"
                     android:singleLine="false"
-                    android:onClick="openNumberCrisisPerMonth"
+                    android:onClick="openListViewActivity"
                     android:stateListAnimator="@null"
                     android:paddingBottom="10dp"/>
                 <ImageView
                     android:id="@+id/ListViewActivity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_month_80"
+                    android:src="@drawable/ic_editor_format_list_bulleted"
                     android:elevation="2dp"
                     android:layout_centerInParent="true"/>
             </RelativeLayout>
@@ -69,29 +69,29 @@
             android:layout_height="0dp"
             android:weightSum="1"
             android:layout_weight="0.5">
-            <RelativeLayout
-                android:layout_width="0dp"
+        <RelativeLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5">
+            <Button
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5">
-                <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:id="@+id/button3"
-                    android:text="Number crisis per year"
-                    android:textSize="18sp"
-                    android:gravity="center|bottom"
-                    android:singleLine="false"
-                    android:onClick="openNumberCrisisPerYear"
-                    android:stateListAnimator="@null"
-                    android:paddingBottom="10dp"/>
-                <ImageView
-                    android:id="@+id/StatisticsActivity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_year_80"
-                    android:elevation="2dp"
-                    android:layout_centerInParent="true"/>
-            </RelativeLayout>
+                android:id="@+id/button3"
+                android:text="Statistics"
+                android:textSize="18sp"
+                android:gravity="center|bottom"
+                android:singleLine="false"
+                android:stateListAnimator="@null"
+                android:onClick="openStatisticsActivity"
+                android:paddingBottom="10dp"/>
+            <ImageView
+                android:id="@+id/StatisticsActivity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_action_trending_up"
+                android:elevation="2dp"
+                android:layout_centerInParent="true"/>
+        </RelativeLayout>
             <RelativeLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
@@ -100,22 +100,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/button4"
-                    android:text="Number crisis per state"
+                    android:text="Settings"
                     android:textSize="18sp"
                     android:gravity="center|bottom"
                     android:singleLine="false"
-                    android:onClick="openNumberCrisisPerState"
                     android:stateListAnimator="@null"
+                    android:onClick="openSettingsActivity"
                     android:paddingBottom="10dp"/>
                 <ImageView
                     android:id="@+id/SettingsActivity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_world_80"
+                    android:src="@drawable/ic_action_settings"
                     android:elevation="2dp"
                     android:layout_centerInParent="true"/>
             </RelativeLayout>
         </TableRow>
     </TableLayout>
+
 
 </LinearLayout>

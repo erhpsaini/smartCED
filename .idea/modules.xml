@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/1.0_smartCED.iml" filepath="$PROJECT_DIR$/1.0_smartCED.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/openCVLibrary2410/openCVLibrary2410.iml" filepath="$PROJECT_DIR$/openCVLibrary2410/openCVLibrary2410.iml" />
-      <module fileurl="file://$PROJECT_DIR$/smartCED.iml" filepath="$PROJECT_DIR$/smartCED.iml" />
     </modules>
   </component>
 </project>
-

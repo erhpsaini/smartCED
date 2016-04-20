@@ -244,44 +244,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
-//            List<Crisis> crisis = databaseHandler.getAllCrisis();
-//            for (Crisis cn : crisis) {
-//                String log = "Id: "+cn.getId()+", Date start: " + cn.getStartDate() + ", Date end: "
-//                        + cn.getEndDate() + ", latitude: " + cn.getLatitude() + ", longitude: " + cn.getLongitude()
-//                        + ", Locality: " + cn.getLocality()+ ", Country: " + cn.getCountry();
-//                // Writing Contacts to log
-//                Log.d("Name ", log);
-//
-//            }
-
-
-            /*
-            try {
-                //Locality = gps.getAddress();
-                locality = getAddress(latitude, longitude).getLocality();
-                countryCode = getAddress(latitude, longitude).getCountryCode();
-                countryName = getAddress(latitude, longitude).getCountryName();
-                thoroughfare = getAddress(latitude,longitude).getThoroughfare();
-                featureName = getAddress(latitude, longitude).getAdminArea();
-                AdminArea = getAddress(latitude, longitude).getAdminArea();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
-
-            // \n is for new line
-            // + "\nLocality" + Locality + "\nCountry code: " + CountryCode + "\nCountry name: " + CountryName
-            /*
-            Toast.makeText(getApplicationContext(),
-                    "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nThoroughfare: " + thoroughfare + "\nLocality: " + locality +
-                            "\nCountry name: " + countryName + "\nCountry code: " + countryCode + "\nFeatureName: " + featureName + "\nAdminArea: " + AdminArea,
-                    Toast.LENGTH_LONG).show();
-            msg = "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nThoroughfare: " + thoroughfare + "\nLocality: " + locality +
-                    "\nCountry name: " + countryName + "\nCountry code: " + countryCode + "\nFeatureName: " + featureName + "\nAdminArea: " + AdminArea;
-            Log.i(TAG, msg);
-            */
             Toast.makeText(getApplicationContext(),
                     "Your Location is - \nLat: " + latitude + "\nLong: " + longitude + "\nLocality: " + locality + "\nCountry: " + country,
                     Toast.LENGTH_LONG).show();
@@ -325,8 +287,6 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         mMaskButton             = (ImageButton) findViewById(R.id.maskButton);
         mDiscardMaskButton      = (ImageButton) findViewById(R.id.discardMaskButton);
         mConfirmMaskButton      = (ImageButton) findViewById(R.id.confirmMaskButton);
-        mlistViewButton         = (ImageButton) findViewById(R.id.listViewButton);
-        mchartViewButton        = (ImageButton) findViewById(R.id.chartViewButton);
         //mPreview                = (TextureView) findViewById(R.id.surface_view);
 
         mGOV = (GestureOverlayView)findViewById(R.id.gestureOverlayView);
@@ -427,8 +387,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             mProcessButton.setVisibility(View.GONE);
             mConfirmMaskButton.setVisibility(View.VISIBLE);
             mDiscardMaskButton.setVisibility(View.VISIBLE);
-            mlistViewButton.setVisibility(View.VISIBLE);
-            mchartViewButton.setVisibility(View.VISIBLE);
+            //mlistViewButton.setVisibility(View.VISIBLE);
+            //mchartViewButton.setVisibility(View.VISIBLE);
         }else if(mIsMaskCreationModeOn){
             mGOV.setVisibility(View.VISIBLE);
         }else {
@@ -444,6 +404,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         //Disabling camera view and releasing camera (important!!)
         if (mOpenCvCameraView != null)
             mOpenCvCameraView.disableView();
+        if(gps.canGetLocation())
+            gps.stopUsingGPS();
     }
 
     public void onCameraViewStarted(int width, int height) {
@@ -587,8 +549,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             mSettingsButton.setVisibility(View.GONE);
             mViewModeButton.setVisibility(View.GONE);
             mMaskButton.setVisibility(View.GONE);
-            mlistViewButton.setVisibility(View.GONE);
-            mchartViewButton.setVisibility(View.GONE);
+            //mlistViewButton.setVisibility(View.GONE);
+            //mchartViewButton.setVisibility(View.GONE);
 
 
             // BEGIN_INCLUDE(prepare_start_media_recorder)
@@ -600,8 +562,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
             mSettingsButton.setVisibility(View.VISIBLE);
             mViewModeButton.setVisibility(View.VISIBLE);
             mMaskButton.setVisibility(View.VISIBLE);
-            mlistViewButton.setVisibility(View.VISIBLE);
-            mchartViewButton.setVisibility(View.VISIBLE);
+            //mlistViewButton.setVisibility(View.VISIBLE);
+            //mchartViewButton.setVisibility(View.VISIBLE);
             // BEGIN_INCLUDE(stop_release_media_recorder)
 
 //            // stop recording and release camera
@@ -1024,9 +986,9 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        VideoCapture video = new VideoCapture();
-//        video.read(inputFrame);
-        //return currentGrayFrame;
+        //VideoCapture video = new VideoCapture();
+        //video.read(inputFrame);
+        // return currentGrayFrame;
     }
     private File createImageFile() throws IOException {
         // Create an image file name
@@ -1261,15 +1223,15 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 //        databaseHandler.addCrisi(new Crisis("2015-11-06 08:26:16", "2015-11-06 08:26:33", 48.85661400000001,2.3522219000000177, "Paris", "France"));
 //        databaseHandler.addCrisi(new Crisis("2015-11-06 09:26:16", "2015-11-06 09:27:08", 48.85661400000001,2.3522219000000177, "Paris", "France"));
 //        databaseHandler.addCrisi(new Crisis("2015-11-06 10:26:16", "2015-11-06 10:28:44", 4.0510564,9.767868700000008, "Douala", "Cameroon"));
-        databaseHandler.addCrisi(new Crisis("2012-08-05 19:26:16", "2012-08-05 19:26:24", 48.85661400000001,2.3522219000000177, "Paris", "France", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-08-05 20:26:16", "2012-08-05 20:27:44", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-08-05 21:26:16", "2012-08-05 21:26:04", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-08-05 22:26:16", "2012-08-05 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-08-05 23:26:16", "2012-08-05 23:27:11", 55.755826,37.6173, "Moscow", "Russia", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-08-06 08:26:16", "2012-08-06 08:26:33", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-08-06 09:26:16", "2012-08-06 09:27:08", 35.6894875,139.69170639999993, "Tokyo", "Japan", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-08-06 10:26:16", "2012-08-06 10:28:44", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-08-07 19:26:16", "2012-08-07 19:26:24", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-05 19:26:16", "2012-08-05 19:26:24", 48.85661400000001,2.3522219000000177, "Paris", "France", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-05 20:26:16", "2012-08-05 20:27:44", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-05 21:26:16", "2012-08-05 21:26:04", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-05 22:26:16", "2012-08-05 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-05 23:26:16", "2012-08-05 23:27:11", 55.755826,37.6173, "Moscow", "Russia", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-06 08:26:16", "2012-08-06 08:26:33", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-06 09:26:16", "2012-08-06 09:27:08", 35.6894875,139.69170639999993, "Tokyo", "Japan", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-06 10:26:16", "2012-08-06 10:28:44", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-08-07 19:26:16", "2012-08-07 19:26:24", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-08-07 20:26:16", "2012-08-07 20:27:44", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-08-07 21:26:16", "2012-08-07 21:26:04", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-08-08 22:26:16", "2012-08-08 22:36:27", 48.85661400000001,2.3522219000000177, "Paris", "France", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
@@ -1278,18 +1240,18 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
         databaseHandler.addCrisi(new Crisis("2012-08-09 09:26:16", "2012-08-09 09:27:08", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-08-09 10:26:16", "2012-08-09 10:28:44", 35.6894875,139.69170639999993, "Tokyo", "Japan", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
 
-        databaseHandler.addCrisi(new Crisis("2012-07-05 19:26:16", "2012-07-05 19:26:24", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-07-05 20:26:16", "2012-07-05 20:27:44", 35.6894875,139.69170639999993, "Tokyo", "Japan", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-07-05 21:26:16", "2012-07-05 21:26:04", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-07-05 22:26:16", "2012-07-05 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-05 19:26:16", "2012-07-05 19:26:24", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-05 20:26:16", "2012-07-05 20:27:44", 35.6894875,139.69170639999993, "Tokyo", "Japan", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-05 21:26:16", "2012-07-05 21:26:04", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-05 22:26:16", "2012-07-05 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-07-05 23:26:16", "2012-07-05 23:27:11", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-07-06 08:26:16", "2012-07-06 08:26:33", 48.85661400000001,2.3522219000000177, "Paris", "France", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-07-06 09:26:16", "2012-07-06 09:27:08", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-07-06 10:26:16", "2012-07-06 10:28:44", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-07-07 19:26:16", "2012-07-07 19:26:24", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-07-07 20:26:16", "2012-07-07 20:27:44", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-07-07 21:26:16", "2012-07-07 21:26:04", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2012-07-08 22:26:16", "2012-07-08 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-06 10:26:16", "2012-07-06 10:28:44", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-07 19:26:16", "2012-07-07 19:26:24", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-07 20:26:16", "2012-07-07 20:27:44", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-07 21:26:16", "2012-07-07 21:26:04", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2012-07-08 22:26:16", "2012-07-08 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-07-08 23:26:16", "2012-07-08 23:27:11", 35.6894875,139.69170639999993, "Tokyo", "Japan", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-07-08 08:26:16", "2012-07-08 08:26:33", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2012-07-09 09:26:16", "2012-07-09 09:27:08", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
@@ -1297,19 +1259,19 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         databaseHandler.addCrisi(new Crisis("2013-02-05 19:26:16", "2013-02-05 19:26:24", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2013-02-05 20:26:16", "2013-02-05 20:27:44", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-05 21:26:16", "2013-06-05 21:26:04", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-05 22:26:16", "2013-06-05 22:36:27", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-05 23:26:16", "2013-06-05 23:27:11", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-06 08:26:16", "2013-06-06 08:26:33", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-06 09:26:16", "2013-06-06 09:27:08", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-06 10:26:16", "2013-06-06 10:28:44", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-05 21:26:16", "2013-06-05 21:26:04", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-05 22:26:16", "2013-06-05 22:36:27", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-05 23:26:16", "2013-06-05 23:27:11", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-06 08:26:16", "2013-06-06 08:26:33", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-06 09:26:16", "2013-06-06 09:27:08", 39.904211,116.40739499999995, "Beijing", "China", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-06 10:26:16", "2013-06-06 10:28:44", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2013-06-07 19:26:16", "2013-06-07 19:26:24", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2013-06-07 20:26:16", "2013-06-07 20:27:44", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2013-06-07 21:26:16", "2013-06-07 21:26:04", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-08 22:26:16", "2013-06-08 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-08 23:26:16", "2013-06-08 23:27:11", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-08 08:26:16", "2013-06-08 08:26:33", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2013-06-09 09:26:16", "2013-06-09 09:27:08", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-08 22:26:16", "2013-06-08 22:36:27", 4.0510564,9.767868700000008, "Douala", "Cameroon", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-08 23:26:16", "2013-06-08 23:27:11", 41.90278349999999,12.496365500000024, "Rome", "Italy", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-08 08:26:16", "2013-06-08 08:26:33", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2013-06-09 09:26:16", "2013-06-09 09:27:08", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2013-06-09 10:26:16", "2013-06-09 10:28:44", 45.5016889,-73.56725599999999, "Montreal", "QC Canada", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
 
         databaseHandler.addCrisi(new Crisis("2014-07-08 22:26:16", "2014-07-08 22:36:27", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
@@ -1320,8 +1282,8 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
         databaseHandler.addCrisi(new Crisis("2015-10-05 19:26:16", "2015-10-05 19:26:24", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2015-10-05 20:26:16", "2015-10-05 20:27:44", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2015-10-05 21:26:16", "2015-10-05 21:26:04", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
-        databaseHandler.addCrisi(new Crisis("2015-10-05 22:26:16", "2015-10-05 22:36:27", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2015-10-05 21:26:16", "2015-10-05 21:26:04", -33.9248685,18.424055299999964, "Capetown", "South Africa", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
+//        databaseHandler.addCrisi(new Crisis("2015-10-05 22:26:16", "2015-10-05 22:36:27", 28.6139391, 77.20902120000005, "New Delhi", "India", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2015-10-05 23:26:16", "2015-10-05 23:27:11", 48.85661400000001,2.3522219000000177, "Paris", "France", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2015-11-06 08:26:16", "2015-11-06 08:26:33", 48.85661400000001,2.3522219000000177, "Paris", "France", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
         databaseHandler.addCrisi(new Crisis("2015-11-06 09:26:16", "2015-11-06 09:27:08", 48.85661400000001,2.3522219000000177, "Paris", "France", "/mnt/sdcard/Pictures/JPEG_20151128_124837_-98223709.jpg"));
@@ -1329,6 +1291,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
 
 
         // Reading all contacts
+        /*
         Log.d("Reading: ", "Reading all crisises..");
         List<Crisis> crisises = databaseHandler.getAllCrisis();
 
@@ -1338,6 +1301,7 @@ public class CameraActivity extends Activity implements CameraBridgeViewBase.CvC
                     + ", Elapstime: " + cn.getElapsedTime();
             // Writing Contacts to log
             Log.d("Name: ", log);
-        }
+
+        }*/
     }
 }
