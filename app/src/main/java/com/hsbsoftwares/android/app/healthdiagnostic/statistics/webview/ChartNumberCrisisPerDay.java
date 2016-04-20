@@ -3,6 +3,9 @@ package com.hsbsoftwares.android.app.healthdiagnostic.statistics.webview;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
@@ -94,7 +97,16 @@ public class ChartNumberCrisisPerDay extends Activity implements
         }
         StringBuilder html = new StringBuilder();
 
-        if (dailyAverage.isEmpty()){
+        if(!isOnline()){
+            html.append("<html>");
+            html.append("<head>");
+            html.append("</head>");
+            html.append("<body><p>");
+            html.append("No network connection.</br>Please check your network connection and try again.");
+            html.append("</p></body></html>");
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }else if (dailyAverage.isEmpty()){
             html.append("<html>");
             html.append("<head>");
             html.append("<link rel=\"stylesheet\" href=\"css/main.css\" />");
@@ -146,11 +158,17 @@ public class ChartNumberCrisisPerDay extends Activity implements
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         StringBuilder html = new StringBuilder();
-
-        if (numberCrisisPerDay.isEmpty()){
-
+        if(!isOnline()){
+            html.append("<html>");
+            html.append("<head>");
+            html.append("</head>");
+            html.append("<body><p>");
+            html.append("No network connection.</br>Please check your network connection and try again.");
+            html.append("</p></body></html>");
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }else if (numberCrisisPerDay.isEmpty()){
             html.append("<html>");
             html.append("<head>");
             html.append("<link rel=\"stylesheet\" href=\"css/main.css\" />");
@@ -158,8 +176,6 @@ public class ChartNumberCrisisPerDay extends Activity implements
             html.append("<body>");
             html.append("<p>No data!</br>Try another date</p>");
             html.append("</body></html>");
-
-
             webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
             webView.requestFocusFromTouch();
         }
@@ -169,7 +185,6 @@ public class ChartNumberCrisisPerDay extends Activity implements
             html.append("<link rel=\"stylesheet\" href=\"assets/css/main.css\" />");
             html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
             html.append("<script type=\"text/javascript\">");
-
             html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
             html.append("google.setOnLoadCallback(drawChart);");
             html.append("function drawChart() {");
@@ -279,5 +294,12 @@ public class ChartNumberCrisisPerDay extends Activity implements
             //toDatePickerDialog.show();
             loadChartAverageDuration(fromDateEtxt.getText().toString().trim(), toDateEtxt.getText().toString().trim());
         }
+    }
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        //return netInfo != null && netInfo.isConnectedOrConnecting();
+        return netInfo != null && netInfo.isConnected();
     }
 }

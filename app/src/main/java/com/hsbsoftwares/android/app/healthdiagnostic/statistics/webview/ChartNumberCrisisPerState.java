@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -44,25 +46,41 @@ public class ChartNumberCrisisPerState extends Activity {
         WebSettings webSettings = webView.getSettings();
         webSettings.setBuiltInZoomControls(true);
 
+        if(!isOnline()){
+            webView.loadDataWithBaseURL("file:///android_asset/", buildHtmlOffline().toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }else{
 
-        webView.loadDataWithBaseURL("file:///android_asset/", buildHtml().toString(), "text/html", "UTF-8", "");
-        webView.requestFocusFromTouch();
+            webView.loadDataWithBaseURL("file:///android_asset/", buildHtml().toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
 
-        // Sets the Chrome Client, and defines the onProgressChanged
-        // This makes the Progress bar be updated.
-        final Activity MyActivity = this;
-        webView.setWebChromeClient(new WebChromeClient() {
-            public void onProgressChanged(WebView view, int progress) {
-                //Make the bar disappear after URL is loaded, and changes string to Loading...
-                MyActivity.setTitle("Loading...");
-                MyActivity.setProgress(progress * 100); //Make the bar disappear after URL is loaded
+            // Sets the Chrome Client, and defines the onProgressChanged
+            // This makes the Progress bar be updated.
+            final Activity MyActivity = this;
+            webView.setWebChromeClient(new WebChromeClient() {
+                public void onProgressChanged(WebView view, int progress) {
+                    //Make the bar disappear after URL is loaded, and changes string to Loading...
+                    MyActivity.setTitle("Loading...");
+                    MyActivity.setProgress(progress * 100); //Make the bar disappear after URL is loaded
 
-                // Return the app name after finish loading
-                if (progress == 100)
-                    MyActivity.setTitle(R.string.app_name);
-            }
-        });
+                    // Return the app name after finish loading
+                    if (progress == 100)
+                        MyActivity.setTitle(R.string.app_name);
+                }
+            });
+        }
         setupActionBar();
+    }
+
+    private StringBuilder buildHtmlOffline(){
+        StringBuilder html = new StringBuilder();
+        html.append("<html>");
+        html.append("<head>");
+        html.append("</head>");
+        html.append("<body><p>");
+        html.append("No network connection.</br>Please check your network connection and try again.");
+        html.append("</p></body></html>");
+        return html;
     }
 
     private StringBuilder buildHtml(){
@@ -143,5 +161,13 @@ public class ChartNumberCrisisPerState extends Activity {
             address=addresses.get(0);
         }
         return address;
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        //return netInfo != null && netInfo.isConnectedOrConnecting();
+        return netInfo != null && netInfo.isConnected();
     }
 }

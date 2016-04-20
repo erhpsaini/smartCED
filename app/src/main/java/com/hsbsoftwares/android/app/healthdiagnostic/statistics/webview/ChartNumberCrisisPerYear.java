@@ -3,6 +3,9 @@ package com.hsbsoftwares.android.app.healthdiagnostic.statistics.webview;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.InputType;
@@ -105,40 +108,62 @@ public class ChartNumberCrisisPerYear extends Activity implements
 
         StringBuilder html = new StringBuilder();
 
-        html.append("<html>");
-        html.append("<head>");
-        html.append("<link rel=\"stylesheet\" href=\"assets/css/main.css\" />");
-        html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
-        html.append("<script type=\"text/javascript\">");
-
-        html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
-        html.append("google.setOnLoadCallback(drawChart);");
-        html.append("function drawChart() {");
-        html.append("var data = google.visualization.arrayToDataTable([");
-        html.append("['Day', 'AverageCrisisduration'],");
-        for (YearlyAverage ya : yearlyAverage){
-            html.append("['");
-            html.append(ya.getYear());
-            html.append("', ");
-            html.append(ya.getAverageCrisisDuration());
-            html.append("],");
+        if(!isOnline()){
+            html.append("<html>");
+            html.append("<head>");
+            html.append("</head>");
+            html.append("<body><p>");
+            html.append("No network connection.</br>Please check your network connection and try again.");
+            html.append("</p></body></html>");
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }else if (yearlyAverage.isEmpty()){
+            html.append("<html>");
+            html.append("<head>");
+            html.append("<link rel=\"stylesheet\" href=\"css/main.css\" />");
+            html.append("</head>");
+            html.append("<body>");
+            html.append("<p>No data!</br>Try another date</p>");
+            html.append("</body></html>");
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
         }
-        html.deleteCharAt(html.length() - 1);
-        html.append("]);");
-        html.append("var options = {title: 'Yearly Average', legend: { position: 'none' }, " +
-                "hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}}, " +
-                "vAxis: {title: 'Time in minute',  titleTextStyle: {color: '#333'}, minValue: 0}};");
-        html.append("var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));");
-        html.append("chart.draw(data, options);");
-        html.append("}</script>");
-        html.append("</head>");
-        html.append("<body>");
-        html.append("<div id=\"chart_div\" style=\"width: 300px; height: 220px;\"></div>");
-        html.append("</body></html>");
+        else {
+            html.append("<html>");
+            html.append("<head>");
+            html.append("<link rel=\"stylesheet\" href=\"assets/css/main.css\" />");
+            html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
+            html.append("<script type=\"text/javascript\">");
+
+            html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
+            html.append("google.setOnLoadCallback(drawChart);");
+            html.append("function drawChart() {");
+            html.append("var data = google.visualization.arrayToDataTable([");
+            html.append("['Day', 'AverageCrisisduration'],");
+            for (YearlyAverage ya : yearlyAverage) {
+                html.append("['");
+                html.append(ya.getYear());
+                html.append("', ");
+                html.append(ya.getAverageCrisisDuration());
+                html.append("],");
+            }
+            html.deleteCharAt(html.length() - 1);
+            html.append("]);");
+            html.append("var options = {title: 'Yearly Average', legend: { position: 'none' }, " +
+                    "hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}}, " +
+                    "vAxis: {title: 'Time in minute',  titleTextStyle: {color: '#333'}, minValue: 0}};");
+            html.append("var chart = new google.visualization.AreaChart(document.getElementById('chart_div'));");
+            html.append("chart.draw(data, options);");
+            html.append("}</script>");
+            html.append("</head>");
+            html.append("<body>");
+            html.append("<div id=\"chart_div\" style=\"width: 300px; height: 220px;\"></div>");
+            html.append("</body></html>");
 
 
-        webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
-        webView.requestFocusFromTouch();
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }
     }
     private void loadChartNumberCrisis(String startDate, String endDate){
         databaseHandler = DatabaseHandler.getInstance(this);
@@ -159,40 +184,62 @@ public class ChartNumberCrisisPerYear extends Activity implements
 
         StringBuilder html = new StringBuilder();
 
-        html.append("<html>");
-        html.append("<head>");
-        html.append("<link rel=\"stylesheet\" href=\"assets/css/main.css\" />");
-        html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
-        html.append("<script type=\"text/javascript\">");
-
-        html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
-        html.append("google.setOnLoadCallback(drawChart);");
-        html.append("function drawChart() {");
-        html.append("var data = google.visualization.arrayToDataTable([");
-        html.append("['Year', 'Number Crisis'],");
-        for (NumberCrisisPerYear ncpy  : numberCrisisPerYear){
-            html.append("['");
-            //html.append(String.valueOf(ncpy.getyear()));
-            html.append(ncpy.getyear());
-            html.append("', ");
-            html.append(ncpy.getNumberOfCrisis());
-            html.append("],");
+        if(!isOnline()){
+            html.append("<html>");
+            html.append("<head>");
+            html.append("</head>");
+            html.append("<body><p>");
+            html.append("No network connection.</br>Please check your network connection and try again.");
+            html.append("</p></body></html>");
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }else if (numberCrisisPerYear.isEmpty()){
+            html.append("<html>");
+            html.append("<head>");
+            html.append("<link rel=\"stylesheet\" href=\"css/main.css\" />");
+            html.append("</head>");
+            html.append("<body>");
+            html.append("<p>No data!</br>Try another date</p>");
+            html.append("</body></html>");
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
         }
-        html.deleteCharAt(html.length() - 1);
-        html.append("]);");
-        html.append(" var options = {title: 'Number of Yearly Crisis', legend: { position: 'none' }, 'width':300, 'height':220, " +
-                "hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}}, " +
-                "vAxis: {title: 'Number of crisis',  titleTextStyle: {color: '#333'}, minValue: 0}};");
-        html.append("var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));");
-        html.append("chart.draw(data, options);");
-        html.append("}</script>");
-        html.append("</head>");
-        html.append("<body>");
-        html.append("<div id='chart_div'></div>");
-        html.append("</body></html>");
+        else {
+            html.append("<html>");
+            html.append("<head>");
+            html.append("<link rel=\"stylesheet\" href=\"assets/css/main.css\" />");
+            html.append("<script type=\"text/javascript\" src=\"https://www.google.com/jsapi\"></script>");
+            html.append("<script type=\"text/javascript\">");
 
-        webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
-        webView.requestFocusFromTouch();
+            html.append("google.load(\"visualization\", \"1.0\", {\"packages\":[\"corechart\"]});");
+            html.append("google.setOnLoadCallback(drawChart);");
+            html.append("function drawChart() {");
+            html.append("var data = google.visualization.arrayToDataTable([");
+            html.append("['Year', 'Number Crisis'],");
+            for (NumberCrisisPerYear ncpy : numberCrisisPerYear) {
+                html.append("['");
+                //html.append(String.valueOf(ncpy.getyear()));
+                html.append(ncpy.getyear());
+                html.append("', ");
+                html.append(ncpy.getNumberOfCrisis());
+                html.append("],");
+            }
+            html.deleteCharAt(html.length() - 1);
+            html.append("]);");
+            html.append(" var options = {title: 'Number of Yearly Crisis', legend: { position: 'none' }, 'width':300, 'height':220, " +
+                    "hAxis: {title: 'Year',  titleTextStyle: {color: '#333'}}, " +
+                    "vAxis: {title: 'Number of crisis',  titleTextStyle: {color: '#333'}, minValue: 0}};");
+            html.append("var chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));");
+            html.append("chart.draw(data, options);");
+            html.append("}</script>");
+            html.append("</head>");
+            html.append("<body>");
+            html.append("<div id='chart_div'></div>");
+            html.append("</body></html>");
+
+            webView.loadDataWithBaseURL("file:///android_asset/", html.toString(), "text/html", "UTF-8", "");
+            webView.requestFocusFromTouch();
+        }
     }
 
     /**
@@ -271,5 +318,12 @@ public class ChartNumberCrisisPerYear extends Activity implements
             //toDatePickerDialog.show();
             loadChartAverageDuration(fromDateEtxt.getText().toString().trim(), toDateEtxt.getText().toString().trim());
         }
+    }
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        //return netInfo != null && netInfo.isConnectedOrConnecting();
+        return netInfo != null && netInfo.isConnected();
     }
 }
